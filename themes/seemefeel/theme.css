@@ -27,7 +27,8 @@ body::before{
   background:var(--bg) url("assets/floral.jpg") center top/cover no-repeat;
 }
 
-/* 상단 제목을 검정 로고로 갈음 */
+/* 상단 제목을 검정 로고로 갈음. header는 안내문을 숨기면 폭이 0으로 접히므로 폭을 직접 준다 */
+header{ width:100% }
 .mark{
   font-size:0 !important; line-height:0; height:84px; width:100%; max-width:320px;
   background:url("assets/logo-black.png") center/contain no-repeat; margin:0 auto;
