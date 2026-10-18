@@ -1,0 +1,6 @@
+{
+  "framework": null,
+  "redirects": [
+    { "source": "/", "missing": [{ "type": "query", "key": "theme" }], "destination": "/?theme=seemefeel", "permanent": false }
+  ]
+}
