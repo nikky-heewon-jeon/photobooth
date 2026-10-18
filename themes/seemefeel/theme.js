@@ -101,8 +101,8 @@ export default {
   labels: { filters:'화면 효과', frames:'뼈다귀 효과' }, // 칸 이름
   images: { frame:'assets/frame.jpg',
             cha:'assets/cha.png',   kim:'assets/kim.png',   pd:'assets/pd.png',      // 일러스트
-            pcha:'assets/pcha.webp', pkim:'assets/pkim.webp', ppd:'assets/ppd.webp', pgan:'assets/pgan-heart.webp', // 실사 누끼 (김간지는 손가락 하트 포즈 — 심의필 게스트용. 파일명을 바꿔 옛 포즈 캐시를 피함)
-            mcha:'assets/mcha.webp', mkim:'assets/mkim.webp', mpd:'assets/mpd.webp',  mgan:'assets/mgan.webp', // 같은 사진, 눈 모자이크 (mgan만 다른 포즈 — 가운뎃손가락, 심의미필용)
+            pcha:'assets/pcha.webp', pkim:'assets/pkim-2.webp', ppd:'assets/ppd.webp', pgan:'assets/pgan-heart.webp', // 실사 누끼 (김간지는 손가락 하트 포즈 — 심의필 게스트용. 파일명을 바꿔 옛 포즈 캐시를 피함)
+            mcha:'assets/mcha.webp', mkim:'assets/mkim-2.webp', mpd:'assets/mpd.webp',  mgan:'assets/mgan.webp', // 같은 사진, 눈 모자이크 (mgan만 다른 포즈 — 가운뎃손가락, 심의미필용)
             stamp:'assets/stamp.png', stamp2:'assets/stamp2.png', stamp2w:'assets/stamp2w.png' }, // 심의필 / 심의미필 도장 / 흰 심의미필 도장(색 종이용 — color로 물들여 씀)
   filters: [
     {id:'original', name:'오리지널', css:'none'},
