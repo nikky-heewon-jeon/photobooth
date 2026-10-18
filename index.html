@@ -108,8 +108,8 @@
   <button class="btn btn-ghost" id="retake">다시 찍기</button>
 </section>
 
-<script src="assets/qrcode.js"></script>
-<script>
+<script src="qrcode.js"></script>
+<script type="module">
 // ── QR 다운로드 설정 (Cloudinary 무서명 업로드) ──────────────
 // 둘 중 하나라도 비우면 QR 대신 안내만 뜨고, SAVE(로컬 저장)는 항상 동작.
 const CLOUD_NAME='disdmlod';   // Cloudinary Cloud name
@@ -120,13 +120,22 @@ const FILTERS=[
   {id:'mono',     name:'흑백',     css:'grayscale(1) contrast(1.08)'},
   {id:'haduri',   name:'하두리',   css:'brightness(1.35) contrast(0.8) saturate(1.12) blur(0.5px)', lo:0.42},
 ];
-const FRAMES=[
-  {id:'white', name:'화이트', bg:'#f7f7f4', txt:'#111'},
-  {id:'black', name:'블랙',   bg:'#101010', txt:'#f4f4f4'},
-];
-const PHRASES=['','오늘 좋았다','또 보자'];
 const SHOTS=4, PW=400, PH=267, PAD=24, GAP=14, FOOT=82, DPR=3;
-let filter=FILTERS[0], frame=FRAMES[0], phrase=PHRASES[0], shots=[];
+
+// ── 테마 로드 ──────────────────────────────────────────────────────
+// ?theme=<폴더명> → themes/<폴더명>/theme.js. 없거나 못 읽으면 base로 떨어진다.
+// 테마 계약: {name, slug, frames:[{id,name,bg,txt}], phrases:[], css?}
+const THEME_ID=new URLSearchParams(location.search).get('theme')||'base';
+const asset=p=>`themes/${THEME_ID}/${p}`; // 테마 폴더 기준으로 경로 해석
+let T, themeErr=false;
+try{ T=(await import(`./themes/${THEME_ID}/theme.js`)).default; }
+catch(e){ themeErr=true; T=(await import('./themes/base/theme.js')).default; }
+if(T.css) document.head.insertAdjacentHTML('beforeend',`<link rel="stylesheet" href="${asset(T.css)}">`);
+document.title=T.name;
+document.querySelectorAll('.mark').forEach(el=>el.textContent=T.name);
+if(themeErr) document.querySelector('#capScreen .tag').textContent=`'${THEME_ID}' 테마를 못 찾아 기본 테마로 엽니다`;
+
+let filter=FILTERS[0], frame=T.frames[0], phrase=T.phrases[0], shots=[];
 
 const $=id=>document.getElementById(id);
 const video=$('cam'), flash=$('flash'), count=$('count'), prog=$('prog');
@@ -140,8 +149,8 @@ function chips(host, list, render, onPick){
   });
 }
 chips($('filters'), FILTERS, t=>t.name, t=>{filter=t; video.style.filter=t.css; updatePreview();});
-chips($('frames'), FRAMES, t=>t.name, t=>{frame=t; updatePreview();});
-chips($('phrases'), PHRASES, t=>t||'없음', t=>{phrase=t; updatePreview();});
+chips($('frames'), T.frames, t=>t.name, t=>{frame=t; updatePreview();});
+chips($('phrases'), T.phrases, t=>t||'없음', t=>{phrase=t; updatePreview();});
 
 (async()=>{
   try{
@@ -239,7 +248,7 @@ setInterval(()=>{ if($('capScreen').classList.contains('on')) updatePreview(); }
 $('download').onclick=()=>{
   $('strip').toBlob(b=>{
     const a=document.createElement('a'); a.href=URL.createObjectURL(b);
-    a.download='photobooth-'+Date.now()+'.png'; a.click(); URL.revokeObjectURL(a.href);
+    a.download=(T.slug||'photobooth')+'-'+Date.now()+'.png'; a.click(); URL.revokeObjectURL(a.href);
   },'image/png');
 };
 </script>
