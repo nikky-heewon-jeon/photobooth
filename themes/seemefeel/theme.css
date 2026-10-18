@@ -28,11 +28,12 @@ body::before{
 }
 
 /* 상단 제목을 검정 로고로 갈음. header는 안내문을 숨기면 폭이 0으로 접히므로 폭을 직접 준다 */
-header{ width:100% }
+header{ width:100%; margin-bottom:32px } /* 로고 아래 여백을 위(.screen padding-top 32px)와 같게 */
 .mark{
   font-size:0 !important; line-height:0; height:84px; width:100%; max-width:320px;
   background:url("assets/logo-black.png") center/contain no-repeat; margin:0 auto;
 }
+.tag, .qrcap, .lab, .chip, .btn, input{ font-weight:700 } /* 엔진의 500·600을 덮는다 — 500은 Light로 떨어짐 */
 .tag, .qrcap{ color:var(--dim) }
 #capScreen .tag{ display:none } /* 로고 아래 안내문은 뺀다 */
 
@@ -43,5 +44,4 @@ header{ width:100% }
 .lab{ color:var(--dim) }
 .chip{ border-width:2px; color:var(--fg) }
 .chip[aria-pressed="true"]{ color:#fff }
-.btn{ font-weight:700 }
 .btn-ghost{ border-width:2px }
