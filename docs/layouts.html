@@ -3,39 +3,72 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>심의필 포토부스 — 진행 상황</title>
-<!-- 고객 공유용 비교 페이지. 실제 테마 파일(../themes/seemefeel)을 그대로 불러 그리므로 프레임이 바뀌면 여기도 같이 바뀐다. -->
+<title>심의필 포토부스 진행 상황</title>
+<!-- 고객 공유 페이지. 실제 테마 파일(../themes/seemefeel)을 그대로 불러 그리므로 프레임이 바뀌면 여기도 같이 바뀐다. -->
 <style>
 @font-face{font-family:"BookkMyungjo";font-weight:700;src:url("../themes/seemefeel/assets/bookk-myungjo-bold.ttf") format("truetype")}
 @font-face{font-family:"BookkMyungjo";font-weight:300;src:url("../themes/seemefeel/assets/bookk-myungjo-light.ttf") format("truetype")}
 @font-face{font-family:"MomsTypewriter";font-weight:100 900;src:url("../themes/seemefeel/assets/moms-typewriter.ttf") format("truetype")}
 *{box-sizing:border-box}
-:root{--s:.5} /* 아이패드 축소 비율 — 아래 스크립트가 창 폭에 맞춰 다시 정한다(폰에서는 더 작게, 크게 보기는 1까지) */
-body{margin:0;background:#e9e7e1;color:#141414;font-family:Pretendard,-apple-system,"Apple SD Gothic Neo",sans-serif;padding:24px 20px 80px;-webkit-text-size-adjust:100%}
-h1{font-size:21px;margin:0 0 6px}
-.intro{font-size:14px;color:#555;margin:0 0 18px;line-height:1.6;max-width:760px}
-.tw{overflow-x:auto;margin:0 0 36px}
-table{border-collapse:collapse;font-size:13px;background:#fff;white-space:nowrap}
-td,th{border:1px solid #cfcdc6;padding:7px 12px;text-align:left}
-th{background:#f3f2ee;font-weight:600}
-td.y{color:#1a7f37;font-weight:600} td.n{color:#ca2b22;font-weight:600}
-section{display:flex;gap:28px;align-items:flex-start;margin-bottom:56px;flex-wrap:wrap}
-.now{display:block;background:#fff;border:1px solid #cfcdc6;padding:22px 24px 26px;margin-bottom:44px}
-.now h2{font-size:19px;margin:0 0 4px}
-.now .date{font-size:12px;color:#777;margin:0 0 14px}
-.now .link{display:inline-block;background:#ca2b22;color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:12px 18px;margin:4px 0 6px}
-.now .sub{font-size:13px;color:#555;margin:0 0 18px;line-height:1.6}
-.shots{display:flex;gap:20px;flex-wrap:wrap;margin:0 0 18px}
-.shots figure{margin:0;flex:1 1 280px;max-width:420px}
-.shots img{width:100%;height:auto;display:block;border:1px solid #cfcdc6;background:#f6f5f1}
-.shots figcaption{font-size:13px;color:#333;margin-top:6px;font-weight:600}
-.notes{font-size:14px;line-height:1.7;color:#222;padding-left:18px;margin:0}
-.notes li{margin-bottom:6px}
-.notes b{color:#ca2b22}
-.divider{font-size:17px;font-weight:700;margin:0 0 6px}
-.divider+p{font-size:13px;color:#666;margin:0 0 20px}
+:root{--s:.5; --paper:#f6f5f1; --ink:#141414; --red:#ca2b22; --dim:#7c756c; --card:#fff; --rule:#d9d6cf}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;font-size:15px;line-height:1.65}
+.wrap{max-width:980px;margin:0 auto;padding:40px 20px 96px}
+h1,h2,.serif{font-family:"BookkMyungjo","Nanum Myeongjo",serif;font-weight:700;letter-spacing:-0.02em}
+
+/* 머리 */
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;padding-bottom:22px;border-bottom:3px solid var(--ink);margin-bottom:36px}
+.head .logo{width:150px;height:54px;background:url("../themes/seemefeel/assets/logo-black.png") left center/contain no-repeat;margin-bottom:10px}
+.head h1{font-size:28px;margin:0;line-height:1.25}
+.head .date{color:var(--dim);font-size:13px;margin:6px 0 0}
+.cta{text-align:right}
+.cta .mail{display:block;font-size:12.5px;color:var(--dim);text-decoration:none;margin-bottom:12px}
+.cta .mail:hover{color:var(--ink)}
+.cta a.btn{display:inline-block;background:var(--red);color:#fff;text-decoration:none;font-weight:700;font-size:16px;padding:14px 22px}
+.cta .url{display:block;font-family:"MomsTypewriter",monospace;font-size:13px;color:var(--ink);margin-top:8px;letter-spacing:.02em}
+.cta .how{display:block;font-size:12.5px;color:var(--dim);margin-top:4px}
+@media(max-width:640px){.cta{text-align:left} .head h1{font-size:24px}}
+
+/* 절 */
+.sec{margin:0 0 48px}
+.sec h2{font-size:20px;margin:0 0 14px;display:flex;align-items:baseline;gap:10px}
+.sec h2 .n{font-family:"MomsTypewriter",monospace;font-size:13px;color:var(--red);letter-spacing:.08em}
+.lead{margin:-6px 0 16px;color:#333;font-size:14.5px}
+
+/* 캡처 두 장 */
+.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
+.shots figure{margin:0;background:var(--card);border:2px solid var(--ink);padding:14px}
+.shots img{width:100%;height:auto;display:block;border:1px solid var(--rule)}
+.shots figcaption{margin-top:12px;font-size:14px;line-height:1.6}
+.shots figcaption b{display:block;font-size:15px;margin-bottom:2px}
+
+/* 확인 요청 카드 */
+.ask{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.ask div{background:var(--card);border:2px solid var(--ink);padding:20px 22px 22px}
+.ask .k{font-family:"MomsTypewriter",monospace;color:var(--red);font-size:13px;letter-spacing:.08em;display:block;margin-bottom:6px}
+.ask h3{font-family:"BookkMyungjo",serif;font-weight:700;font-size:17px;margin:0 0 8px;letter-spacing:-0.02em}
+.ask p{margin:0;font-size:14.5px;color:#222}
+
+/* 프레임 5종 */
+.gallery{display:flex;gap:18px;align-items:flex-start;overflow-x:auto;padding-bottom:8px}
+.gallery figure{margin:0;flex:0 0 auto;text-align:center;font-size:12.5px;color:#333;line-height:1.4}
+.gallery .num{display:block;font-family:"MomsTypewriter",monospace;color:var(--red);font-size:13px;letter-spacing:.08em;margin-bottom:2px}
+.gallery canvas{height:min(400px,70vw);width:auto;display:block;margin-bottom:8px;border:1px solid var(--rule);background:#fff}
+.facts{margin:18px 0 0;padding-left:18px;font-size:14.5px;color:#222}
+.facts li{margin-bottom:4px}
+
+/* 기록(접힘) */
+details.archive{border-top:1px solid var(--rule);padding-top:18px}
+details.archive summary{cursor:pointer;font-family:"BookkMyungjo",serif;font-weight:700;font-size:17px;letter-spacing:-0.02em;list-style:none;display:flex;align-items:center;gap:10px}
+details.archive summary::-webkit-details-marker{display:none}
+details.archive summary::before{content:"";width:0;height:0;border:6px solid transparent;border-left:9px solid var(--ink);transition:transform .15s}
+details.archive[open] summary::before{transform:rotate(90deg) translateX(2px)}
+details.archive summary small{font-family:Pretendard,sans-serif;font-weight:400;font-size:13px;color:var(--dim)}
+.archive-body{margin-top:22px}
+.archive-body .intro{font-size:13.5px;color:#555;margin:0 0 18px;max-width:760px}
+.archive-body section{display:flex;gap:28px;align-items:flex-start;margin-bottom:56px;flex-wrap:wrap}
 .desc{flex:0 0 330px;max-width:100%}
-.desc h2{font-size:20px;margin:0 0 4px}
+.desc h2{font-size:20px;margin:0 0 4px;font-family:inherit}
 .desc h2 b{display:inline-block;width:28px;height:28px;line-height:28px;text-align:center;background:#141414;color:#fff;margin-right:8px;font-size:15px;border-radius:4px}
 .desc p{font-size:13.5px;line-height:1.65;color:#333;margin:10px 0}
 .desc ul{font-size:13px;line-height:1.6;color:#333;padding-left:18px;margin:6px 0}
@@ -45,7 +78,12 @@ section{display:flex;gap:28px;align-items:flex-start;margin-bottom:56px;flex-wra
 .pad{width:calc(844px*var(--s));height:calc(1204px*var(--s));position:relative;margin-bottom:28px}
 .pad .cap{position:absolute;left:0;bottom:-22px;font-size:12px;color:#666;white-space:nowrap}
 .frame{transform:scale(var(--s));transform-origin:top left;width:844px;height:1204px;border:12px solid #1b1b1b;border-radius:30px;background:#1b1b1b;box-shadow:0 10px 30px rgba(0,0,0,.18)}
-body.big section{display:none} body.big section.show{display:flex}
+body.big .archive-body section{display:none} body.big .archive-body section.show{display:flex}
+.tw{overflow-x:auto;margin:0 0 36px}
+table{border-collapse:collapse;font-size:13px;background:#fff;white-space:nowrap}
+td,th{border:1px solid #cfcdc6;padding:7px 12px;text-align:left}
+th{background:#f3f2ee;font-weight:600}
+td.y{color:#1a7f37;font-weight:600} td.n{color:#ca2b22;font-weight:600}
 
 /* ── 아이패드 화면 — 앱 CSS·테마 그대로 ── */
 .ipad{width:820px;height:1180px;position:relative;overflow:hidden;border-radius:18px;
@@ -99,27 +137,54 @@ body.big section{display:none} body.big section.show{display:flex}
 </style>
 </head>
 <body>
-<h1>심의필 포토부스 — 진행 상황 공유</h1>
-<div class="now">
-  <h2>지금 상태 (가안)</h2>
-  <p class="date">2026년 10월 18일 기준</p>
-  <a class="link" href="https://seemefeel-photobooth.vercel.app/" target="_blank" rel="noopener">포토부스 열어보기 → seemefeel-photobooth.vercel.app</a>
-  <p class="sub">아이패드를 세로로 세워 사파리로 여시면 실제 사용 화면 그대로입니다. 카메라 권한을 허용해 주세요. PC에서도 열리지만 화면 비율은 아이패드 기준입니다.</p>
-  <div class="shots">
-    <figure><img src="shot-before.webp" alt="촬영 전 화면"><figcaption>촬영 전 — 화면 효과·뼈다귀 효과를 고르고 START</figcaption></figure>
-    <figure><img src="shot-after.webp" alt="촬영 후 화면"><figcaption>촬영 후 — 완성 4컷, QR, 저장, 다시 찍기</figcaption></figure>
-  </div>
-  <ul class="notes">
-    <li><b>QR은 최종안 확정 이후부터 사용할 수 있습니다.</b> 지금 화면의 QR은 자리만 잡아 둔 것이라 찍어도 사진이 열리지 않습니다. 확정되면 행사용 저장소를 연결해 QR로 바로 가져갈 수 있게 합니다. 그 전까지는 "저장" 버튼으로 기기에 저장됩니다.</li>
-    <li><b>결과 화면 오른쪽 아래가 비어 있습니다.</b> QR과 버튼 아래 자리에 넣고 싶은 마케팅 문구(예: 방송 시간, 유튜브 안내, 해시태그)가 있으면 전달해 주세요. 문구를 받으면 그 자리에 넣어 드립니다.</li>
-    <li>뼈다귀 효과 5종: 일러스트 와이드·세로, 심의필 오리지날, 심의필 스페-샬 게스트, 심의미필 스페-샬 게스트(눈·손 모자이크). 화면 효과 2종: 오리지널, 스크린톤.</li>
-    <li>출연자 사진은 톤을 맞춰 보정했고, 심의필 도장은 사선으로 찍힙니다. 아래 "참고" 항목에 프레임 5종이 있습니다.</li>
-  </ul>
-</div>
+<div class="wrap">
 
-<p class="divider">참고 — 화면 배치 검토안 (A안으로 적용됨)</p>
-<p class="intro">세로로 세운 아이패드(820×1180) 기준입니다. 실제 포토부스 디자인 그대로 그렸고 카메라 자리만 회색입니다(반투명 출연자 가이드는 실제 동작). 프레임 버튼을 누르면 오른쪽 미리보기가 바뀝니다. 각 안의 “크게 보기”를 누르면 실제 크기로 볼 수 있어요.</p>
-<div class="tw"><table>
+<header class="head">
+  <div>
+    <div class="logo" role="img" aria-label="심의필"></div>
+    <h1>포토부스 진행 상황</h1>
+    <p class="date">2026년 10월 18일 기준 · 가안</p>
+  </div>
+  <div class="cta">
+    <a class="mail" href="mailto:hw941027@gmail.com">문의 · hw941027@gmail.com</a>
+    <a class="btn" href="https://seemefeel-photobooth.vercel.app/" target="_blank" rel="noopener">포토부스 열어보기</a>
+    <span class="url">seemefeel-photobooth.vercel.app</span>
+    <span class="how">아이패드를 세로로 세워 사파리에서 열면 실제 화면 그대로입니다. 카메라 권한을 허용해 주세요.</span>
+  </div>
+</header>
+
+<section class="sec">
+  <h2><span class="n">01</span>지금 화면</h2>
+  <div class="shots">
+    <figure><img src="shot-before.webp" alt="촬영 전 화면"><figcaption><b>촬영 전</b>화면 효과와 뼈다귀 효과를 고르고 시작을 누릅니다. 오른쪽 미리보기에 라이브 화면이 비치고, 촬영이 시작되면 찍힌 컷이 한 장씩 쌓여요.</figcaption></figure>
+    <figure><img src="shot-after.webp" alt="촬영 후 화면"><figcaption><b>촬영 후</b>완성된 4컷과 QR, 저장, 다시 찍기. QR과 버튼은 같은 폭으로 오른쪽에 모았습니다.</figcaption></figure>
+  </div>
+</section>
+
+<section class="sec">
+  <h2><span class="n">02</span>확인 부탁드려요</h2>
+  <div class="ask">
+    <div><span class="k">QR</span><h3>QR은 최종안 확정 뒤부터 씁니다</h3><p>지금 화면의 QR은 자리만 잡아 둔 것이라 찍어도 사진이 열리지 않아요. 확정되면 행사용 저장소를 연결해 QR로 바로 가져갈 수 있게 합니다. 그 전까지는 저장 버튼으로 기기에 저장돼요.</p></div>
+    <div><span class="k">COPY</span><h3>결과 화면 오른쪽 아래가 비어 있습니다</h3><p>QR과 버튼 아래 자리에 넣을 문구가 있으면 보내 주세요. 방송 시간이나 유튜브 채널 안내, 해시태그처럼 짧은 문구가 맞습니다. 받는 대로 그 자리에 넣어 드릴게요.</p></div>
+  </div>
+</section>
+
+<section class="sec">
+  <h2><span class="n">03</span>들어 있는 것</h2>
+  <p class="lead">뼈다귀 효과 5종입니다. 사진 자리는 회색으로 비워 두었어요.</p>
+  <div class="gallery" id="gallery"></div>
+  <ul class="facts">
+    <li>화면 효과 2종: 오리지널, 스크린톤.</li>
+    <li>출연자 네 분의 사진은 톤을 맞춰 보정했고, 심의필 도장은 사선으로 찍힙니다.</li>
+    <li>심의미필 버전은 검정 종이에 빨간 도장이고, 출연자 눈과 손에 모자이크가 들어가요.</li>
+  </ul>
+</section>
+
+<details class="archive" id="archive">
+  <summary>화면 배치 검토 기록 <small>A안(좌우 2단)을 적용했습니다</small></summary>
+  <div class="archive-body">
+    <p class="intro">세로로 세운 아이패드(820×1180) 기준입니다. 카메라 자리만 회색이고 반투명 출연자 가이드는 실제 동작입니다. 프레임 버튼을 누르면 미리보기가 바뀝니다.</p>
+    <div class="tw"><table>
 <tr><th></th><th>기존 (한 열)</th><th>A 좌우 2단</th><th>B 위아래 고정</th><th>C 두 화면</th></tr>
 <tr><th>라이브 카메라 폭</th><td>514px</td><td>~430px</td><td>560px</td><td>772px (촬영 화면)</td></tr>
 <tr><th>완성 미리보기 폭</th><td>139px</td><td>~255px</td><td>~210px</td><td>~275px</td></tr>
@@ -127,8 +192,7 @@ body.big section{display:none} body.big section.show{display:flex}
 <tr><th>스크롤</th><td class="n">있음</td><td class="y">없음</td><td class="y">없음 (프레임이 늘어도 위·아래 고정)</td><td class="y">없음</td></tr>
 <tr><th>찍기까지 터치</th><td>1번</td><td>1번</td><td>1번</td><td>2번 (START → 자리 잡고 → 촬영)</td></tr>
 </table></div>
-
-<section data-opt="A">
+    <section data-opt="A">
   <div class="desc">
     <h2><b>A</b>좌우 2단 <span style="font-size:11px;background:#ca2b22;color:#fff;padding:3px 7px;vertical-align:middle;font-weight:600">지금 적용된 안</span></h2>
     <p>왼쪽에 라이브 카메라·필터·프레임·START, 오른쪽에 완성 미리보기를 세로로 길게. 한 화면에 전부 들어가 스크롤이 없고, START를 누르면 바로 위 카메라에서 카운트다운이 돕니다.</p>
@@ -158,9 +222,7 @@ body.big section{display:none} body.big section.show{display:flex}
       </div>
     </div><div class="cap">A — 한 화면, 스크롤 없음</div></div>
   </div>
-</section>
-
-<section data-opt="B">
+</section><section data-opt="B">
   <div class="desc">
     <h2><b>B</b>위아래 고정 (뷰파인더형)</h2>
     <p>로고와 라이브 카메라를 화면 위에, START를 아래에 고정하고 가운데(필터·프레임·미리보기)만 스크롤되는 카메라 앱 구조. 프레임이 10개가 돼도 카메라와 START는 늘 보입니다.</p>
@@ -190,9 +252,7 @@ body.big section{display:none} body.big section.show{display:flex}
       </div>
     </div><div class="cap">B — 위·아래 고정, 가운데만 스크롤</div></div>
   </div>
-</section>
-
-<section data-opt="C">
+</section><section data-opt="C">
   <div class="desc">
     <h2><b>C</b>두 화면 (고르기 → 촬영)</h2>
     <p>첫 화면은 고르기 전용: 큰 버튼과 가장 큰 미리보기. START를 누르면 촬영 화면으로 넘어가 카메라가 화면 폭을 다 씁니다. 자리 잡을 시간을 주기 위해 촬영 화면에서 한 번 더 “촬영 시작”을 누릅니다.</p>
@@ -231,15 +291,10 @@ body.big section{display:none} body.big section.show{display:flex}
     </div><div class="cap">C-2 촬영 화면 (START 뒤)</div></div>
   </div>
 </section>
-
-<section data-opt="G">
-  <div class="desc">
-    <h2>참고 — 프레임 5종</h2>
-    <p>일러스트 2종, 심의필 2종(흰 종이 + 빨간 도장), 심의미필 1종(검정 종이 + 빨간 도장, 눈 모자이크). 사진 자리는 회색입니다.</p>
   </div>
-  <div class="gallery" id="gallery"></div>
-</section>
+</details>
 
+</div>
 <script type="module">
 import T from '../themes/seemefeel/theme.js';
 const IMG={};
@@ -255,6 +310,7 @@ function chips(host,list,onPick,sel=0){
     b.onclick=()=>{ [...host.children].forEach((c,j)=>c.setAttribute('aria-pressed',j===i)); onPick(t); }; host.appendChild(b); });
 }
 const g=(frame,filter)=>({frame,filter,phrase:'',date:'',img:IMG,letterSpace:s=>s});
+const drawers=[];
 document.querySelectorAll('.ipad').forEach(ip=>{
   let frame=FR[+ip.dataset.def||0], filter=FX[0];
   const draw=()=>{
@@ -264,10 +320,11 @@ document.querySelectorAll('.ipad').forEach(ip=>{
   };
   ip.querySelectorAll('.filters').forEach(h=>chips(h,FX,t=>{filter=t;draw();}));
   ip.querySelectorAll('.frames').forEach(h=>chips(h,FR,t=>{frame=t;draw();},+ip.dataset.def||0));
-  draw();
+  draw(); drawers.push(draw);
 });
+document.getElementById('archive')?.addEventListener('toggle',()=>drawers.forEach(f=>f())); // 펼칠 때 가이드 캔버스 다시
 const gal=document.getElementById('gallery');
-FR.forEach(f=>{ const fig=document.createElement('figure'); const cv=document.createElement('canvas'); T.compose(cv,[],g(f,FX[0])); fig.appendChild(cv); fig.insertAdjacentHTML('beforeend',`${f.name} ${f.sub||''}`); gal.appendChild(fig); });
+FR.forEach((f,i)=>{ const fig=document.createElement('figure'); const cv=document.createElement('canvas'); T.compose(cv,[],g(f,FX[0])); fig.appendChild(cv); fig.insertAdjacentHTML('beforeend',`<span class="num">0${i+1}</span>${f.name}<br>${f.sub||''}`); gal.appendChild(fig); });
 const big=new URLSearchParams(location.search).get('big');
 if(big){ document.body.classList.add('big'); document.querySelector(`section[data-opt="${big}"]`)?.classList.add('show'); }
 const fit=()=>document.documentElement.style.setProperty('--s', Math.min(big?1:.5, (document.documentElement.clientWidth-40)/844)); // 아이패드가 창 폭을 넘지 않게
