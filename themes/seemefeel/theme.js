@@ -3,26 +3,22 @@
 export default {
   name: '심의필',
   slug: 'seemefeel',
-  foot: 190,                       // 사진 아래 높이 — 로고가 들어가서 기본(82)보다 크다
+  foot: 170,                       // 사진 아래 높이 — 로고가 들어가서 기본(82)보다 크다
+  css: 'theme.css',                // 날짜용 타자기 폰트
   images: { logo: 'assets/logo.png' },
   frames: [
     {id:'black', name:'기본', bg:'#0a0a0a', txt:'#fff'},
   ],
-  phrases: ['','심의 통과','전체관람가'],
+  // phrases 없음 — 문구 칸을 안 쓴다(엔진이 칸 자체를 숨긴다)
   draw(x, g){
     const L=g.img.logo;
-    if(g.phrase){
-      x.fillStyle=g.frame.txt; x.textAlign='center';
-      x.font='600 16px Pretendard,sans-serif';
-      x.fillText(g.letterSpace(g.phrase,1), g.W/2, g.baseY+26);
-    }
     if(L && L.complete && L.naturalWidth){
       const lw=g.W*0.62, lh=lw*L.naturalHeight/L.naturalWidth;
-      x.drawImage(L, (g.W-lw)/2, g.baseY+44, lw, lh);
+      x.drawImage(L, (g.W-lw)/2, g.baseY+30, lw, lh);
     }
     x.fillStyle=g.frame.txt; x.textAlign='center';
-    x.globalAlpha=.45; x.font='400 12px Pretendard,sans-serif';
-    x.fillText(g.letterSpace(g.date,1), g.W/2, g.baseY+176);
+    x.globalAlpha=.45; x.font='400 13px "MomsTypewriter", monospace';
+    x.fillText(g.letterSpace(g.date,1), g.W/2, g.baseY+152);
     x.globalAlpha=1;
   },
 };

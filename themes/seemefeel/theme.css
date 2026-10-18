@@ -1,0 +1,7 @@
+/* 심의필 테마 폰트 — 날짜에 쓰는 타자기체(지은불사에서 쓰던 것).
+   경로는 이 CSS 파일 기준이라 themes/seemefeel/assets/ 로 풀린다. */
+@font-face{
+  font-family:"MomsTypewriter";
+  src:url("assets/moms-typewriter-v2.ttf") format("truetype");
+  font-display:swap;
+}

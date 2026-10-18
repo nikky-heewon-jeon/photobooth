@@ -9,7 +9,7 @@ for(const d of readdirSync('themes',{withFileTypes:true}).filter(d=>d.isDirector
     if(!T.name) err.push('name 없음');
     if(!Array.isArray(T.frames)||!T.frames.length) err.push('frames 비었음');
     (T.frames||[]).forEach((f,i)=>{ if(!f.id||!f.name||!f.bg||!f.txt) err.push(`frames[${i}]에 id·name·bg·txt 중 누락`); });
-    if(!Array.isArray(T.phrases)||!T.phrases.length) err.push('phrases 비었음');
+    if(T.phrases!==undefined && !Array.isArray(T.phrases)) err.push('phrases가 배열이 아님'); // 없어도 됨 — 문구 칸을 안 쓰는 테마
   }catch(e){ err.push('import 실패: '+e.message); }
   console.log(err.length?`✗ ${d.name} — ${err.join(' / ')}`:`✓ ${d.name}`);
   if(err.length) bad++;

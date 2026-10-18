@@ -137,7 +137,7 @@ const IMG={}; // 테마가 선언한 이미지를 미리 띄워둔다. draw()에
 for(const [k,path] of Object.entries(T.images||{})){ const i=new Image(); i.src=asset(path); IMG[k]=i; }
 if(themeErr) document.querySelector('#capScreen .tag').textContent=`'${THEME_ID}' 테마를 못 찾아 기본 테마로 엽니다`;
 
-let filter=FILTERS[0], frame=T.frames[0], phrase=T.phrases[0], shots=[];
+let filter=FILTERS[0], frame=T.frames[0], phrase=T.phrases?.[0]||'', shots=[];
 
 const $=id=>document.getElementById(id);
 const video=$('cam'), flash=$('flash'), count=$('count'), prog=$('prog');
@@ -152,7 +152,9 @@ function chips(host, list, render, onPick){
 }
 chips($('filters'), FILTERS, t=>t.name, t=>{filter=t; video.style.filter=t.css; updatePreview();});
 chips($('frames'), T.frames, t=>t.name, t=>{frame=t; updatePreview();});
-chips($('phrases'), T.phrases, t=>t||'없음', t=>{phrase=t; updatePreview();});
+// 문구를 안 쓰는 테마는 MESSAGE 칸을 통째로 없앤다(빈 칸이 남지 않게)
+if(T.phrases?.length) chips($('phrases'), T.phrases, t=>t||'없음', t=>{phrase=t; updatePreview();});
+else{ const r=$('phrases'); r.previousElementSibling.remove(); r.remove(); }
 
 (async()=>{
   try{
@@ -252,6 +254,8 @@ function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.t
 $('shoot').onclick=shoot;
 $('retake').onclick=()=>show('capScreen');
 setInterval(()=>{ if($('capScreen').classList.contains('on')) updatePreview(); }, 450);
+// 테마 웹폰트가 늦게 뜨면 캔버스가 대체 폰트로 그려지므로, 로드 후 한 번 다시 그린다
+if(document.fonts) document.fonts.ready.then(()=>{ if($('capScreen').classList.contains('on')) updatePreview(); });
 $('download').onclick=()=>{
   $('strip').toBlob(b=>{
     const a=document.createElement('a'); a.href=URL.createObjectURL(b);
