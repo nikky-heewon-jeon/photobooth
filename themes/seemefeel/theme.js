@@ -62,10 +62,16 @@ function paperBg(x,W,H,base){ x.drawImage(paperCanvas(W,H,base),0,0); }
 function printOn(x,W,H,[rx,ry,rw,rh]){ // 사진 위에 종이 질감을 곱한다 — 종이에 인화된 것처럼 알갱이가 비친다 (항상 흰 바탕 기준)
   x.save(); x.globalCompositeOperation='multiply'; x.globalAlpha=.55; x.drawImage(paperCanvas(W,H,'#ffffff'),rx,ry,rw,rh,rx,ry,rw,rh); x.restore();
 }
-function seal(x,im,{cx,cy,w,deg,blend='multiply'}){ // 도장 — 흰 종이엔 multiply로 스민 느낌, 색 종이엔 그냥 올린다(곱하면 죽는다)
+const _tint={};
+function tintOf(im,color){ // 흰 도장을 color로 물들인다(알파·질감 그대로). 이미지·색별로 한 번만
+  const k=im.src+color; if(!_tint[k]){ const c=document.createElement('canvas'); c.width=im.naturalWidth; c.height=im.naturalHeight; const q=c.getContext('2d');
+    q.drawImage(im,0,0); q.globalCompositeOperation='source-in'; q.fillStyle=color; q.fillRect(0,0,c.width,c.height); _tint[k]=c; }
+  return _tint[k];
+}
+function seal(x,im,{cx,cy,w,deg,blend='multiply',color}){ // 도장 — 흰 종이엔 multiply로 스민 느낌, 색 종이엔 그냥 올린다(곱하면 죽는다). color면 그 색으로 물들여 찍는다
   const h=w*im.naturalHeight/im.naturalWidth;
   x.save(); x.translate(cx,cy); x.rotate(deg*Math.PI/180); x.globalAlpha=.94; x.globalCompositeOperation=blend;
-  x.drawImage(im,-w/2,-h/2,w,h); x.restore();
+  x.drawImage(color?tintOf(im,color):im,-w/2,-h/2,w,h); x.restore();
 }
 function cover(x,img,dx,dy,dw,dh){ // 비율 유지하고 가운데를 채운다
   const s=Math.max(dw/img.width,dh/img.height), cw=dw/s, ch=dh/s;
@@ -101,7 +107,7 @@ export default {
             cha:'assets/cha.png',   kim:'assets/kim.png',   pd:'assets/pd.png',      // 일러스트
             pcha:'assets/pcha.webp', pkim:'assets/pkim.webp', ppd:'assets/ppd.webp', pgan:'assets/pgan.webp', // 실사 누끼
             mcha:'assets/mcha.webp', mkim:'assets/mkim.webp', mpd:'assets/mpd.webp',  mgan:'assets/mgan.webp', // 같은 사진, 눈 모자이크
-            stamp:'assets/stamp.png', stamp2:'assets/stamp2.png', stamp2w:'assets/stamp2w.png' }, // 심의필 / 심의미필 도장 / 흰 심의미필 도장(빨간 종이용)
+            stamp:'assets/stamp.png', stamp2:'assets/stamp2.png', stamp2w:'assets/stamp2w.png' }, // 심의필 / 심의미필 도장 / 흰 심의미필 도장(색 종이용 — color로 물들여 씀)
   filters: [
     {id:'original', name:'오리지널', css:'none'},
     {id:'tone',     name:'스크린톤', css:'grayscale(1) contrast(1.18)'},
@@ -111,8 +117,8 @@ export default {
     {id:'tall-i', name:'일러스트', sub:'세로 버-전',          layout:'tall', cast:'illust',     bg:'#0a0a0a', txt:RED},
     {id:'tall-p', name:'심의필',   sub:'오리지날-버-전',      layout:'tall', cast:'photo',      paper:true, bg:'#f7f6f2', txt:RED, color:RED}, // paper: 꽃 대신 흰 종이 + 도장
     {id:'tall-g', name:'심의필',   sub:'스페-샬 게스트 버-전', layout:'tall', cast:'photoGuest', paper:true, bg:'#f7f6f2', txt:RED, color:RED}, // 4컷에 김간지
-    {id:'tall-g2',name:'심의미필', sub:'스페-샬 게스트 버-전', layout:'tall', cast:'photoGuestM', paper:true, paperColor:RED, bg:RED, txt:'#fff', color:'#787878',
-     stamp:{key:'stamp2w', w:860, cx:600, blend:'source-over'}}, // 빨간 종이 + 눈 모자이크 + 흰 심의미필 도장. 칩은 회색(검정·빨강과 구분)
+    {id:'tall-g2',name:'심의미필', sub:'스페-샬 게스트 버-전', layout:'tall', cast:'photoGuestM', paper:true, paperColor:'#141414', bg:'#141414', txt:'#d4ff3a', color:'#787878',
+     stamp:{key:'stamp2w', w:860, cx:600, blend:'source-over', color:'#d4ff3a'}}, // 검정 종이 + 눈 모자이크 + 형광 연두 심의미필 도장(흰 도장을 물들임). 칩은 회색(형광은 흰 칩에서 안 읽힘)
   ],
 
   // 스트립 전체를 그린다 — 캔버스 크기·배경·컷·출연자·테두리
