@@ -8,9 +8,9 @@ const RED='#ca2b22';
 let _tone=null;
 function tone(x){
   if(_tone) return _tone;
-  const c=document.createElement('canvas'); c.width=c.height=4;
-  const q=c.getContext('2d'); q.fillStyle='rgba(10,10,10,.32)';
-  q.fillRect(0,0,1.5,1.5); q.fillRect(2,2,1.5,1.5);
+  const c=document.createElement('canvas'); c.width=c.height=6;
+  const q=c.getContext('2d'); q.fillStyle='rgba(8,8,8,.55)';
+  q.beginPath(); q.arc(1.5,1.5,1.5,0,7); q.arc(4.5,4.5,1.5,0,7); q.fill();
   return _tone=x.createPattern(c,'repeat');
 }
 const cuts=g=>Array.from({length:g.SHOTS},(_,i)=>[g.PAD, g.PAD+i*(g.PH+g.GAP), g.PW, g.PH]);
