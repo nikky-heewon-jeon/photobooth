@@ -67,7 +67,7 @@
   body[data-preview="side"] .capmain{display:grid; grid-template-columns:minmax(0,1fr) 300px; grid-template-rows:auto 1fr auto;
     grid-template-areas:"head head" "panel pv" "btn pv"; column-gap:20px; max-width:none; width:100%; align-items:start}
   body[data-preview="side"] .capmain>header{grid-area:head}
-  body[data-preview="side"] .capmain>.panel:not(#pv){grid-area:panel}
+  body[data-preview="side"] .capmain>.panel:not(#pv){grid-area:panel; max-width:none} /* 열 폭을 꽉 채워 START와 같은 폭 */
   body[data-preview="side"] #shoot{grid-area:btn; align-self:end; max-width:none}
   body[data-preview="side"] #pv{grid-area:pv}
   body[data-preview="side"] #pv .lab{margin-top:0}

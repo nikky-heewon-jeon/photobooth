@@ -51,12 +51,12 @@ body.big section{display:none} body.big section.show{display:flex}
 .count{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:140px;color:#fff;text-shadow:0 4px 40px rgba(0,0,0,.7);background:rgba(0,0,0,.2)}
 .lab{font-size:12px;color:#7c756c;margin:22px 0 11px}
 .lab.first{margin-top:0}
-.row{display:flex;gap:9px;flex-wrap:wrap}
-.chip{flex:1 1 0;min-width:80px;background:#fff;border:2px solid var(--chip,#141414);color:var(--chip,#141414);
-  padding:14px 8px;font-size:15px;font-family:inherit;font-weight:700;letter-spacing:inherit;text-align:center;cursor:pointer;line-height:1.2}
+.row{display:flex;gap:20px;flex-wrap:wrap}
+.chip{flex:1 1 45%;min-width:80px;background:color-mix(in srgb,var(--chip,#141414) 12%,#fff);border:2px solid transparent;color:var(--chip,#141414);
+  min-height:64px;display:flex;flex-direction:column;justify-content:center;padding:10px 6px;font-size:15px;font-family:inherit;font-weight:700;letter-spacing:inherit;text-align:center;cursor:pointer;line-height:1.2}
 .chip[aria-pressed="true"]{color:#fff;background:var(--chip,#141414)}
 .chip small{display:block;font-size:11px;margin-top:5px;white-space:nowrap;letter-spacing:-0.04em;overflow:hidden}
-.frames{gap:20px}.frames .chip{flex:1 1 45%;padding:12px 6px}
+.frames .chip{flex:1 1 45%}
 .btn{display:block;width:100%;padding:18px;border:none;background:#ca2b22;color:#fff;font:inherit;font-size:17px;letter-spacing:.02em;cursor:pointer;text-align:center;flex:none}
 .btn.ghost{background:#fff;color:#141414;border:2px solid #141414;margin-top:10px}
 .pv{align-items:center}

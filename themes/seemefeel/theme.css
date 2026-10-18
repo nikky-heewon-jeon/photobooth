@@ -45,8 +45,13 @@ header{ width:100%; margin-bottom:32px } /* 로고 아래 여백을 위(.screen 
 #preview{ border-width:2px } /* 오른쪽 열 폭에 맞춰 커진다(엔진 preview:'side' 규칙) */
 
 .lab{ color:var(--dim) }
-.chip{ border-width:2px; color:var(--chip, var(--fg)) } /* 계열 색(프레임의 color) — 없으면 검정 */
-.chip[aria-pressed="true"]{ color:#fff }
+/* 칩 — 계열 색(프레임의 color, 없으면 검정)을 12%만 섞어 연하게 채우고 테두리는 없앰. 고르면 그 색으로 꽉 채움.
+   필터·프레임 칩이 같은 높이·같은 간격(20px)으로 맞물리게 — 프레임 칩이 두 줄이라 필터 칩도 같은 높이로 */
+.row{ gap:20px }
+.chip{ border:2px solid transparent; color:var(--chip, var(--fg)); background:#ececec; background:color-mix(in srgb, var(--chip, var(--fg)) 12%, #fff);
+  min-height:64px; display:flex; flex-direction:column; justify-content:center; padding:10px 6px; line-height:1.2 }
+.chip[aria-pressed="true"]{ color:#fff; background:var(--chip, var(--fg)) }
+#filters .chip{ flex:1 1 45% }
 .btn-ghost{ border-width:2px }
 
 /* 스크린톤을 고르면 라이브뷰에도 망점 — 가이드 레이어 배경으로 얹는다(카운트다운 숫자 아래, 영상 위) */
@@ -58,6 +63,6 @@ body[data-filter="tone"] .guide{
 
 /* 프레임 칩 — 윗줄 계열(일러스트·심의필·심의미필), 아랫줄 버전은 작게 '무조건 한 줄'. 두 개씩 한 줄, 줄 간격 20.
    아랫줄 글씨는 칩 폭에 맞춰 줄어든다(최대 11px, 아래 제한 없음) — 어떤 폭에서도 꺾이지 않게 */
-#frames{ gap:20px; container-type:inline-size }
-#frames .chip{ flex:1 1 45%; line-height:1.2; padding:12px 6px }
+#frames{ container-type:inline-size }
+#frames .chip{ flex:1 1 45% }
 #frames .chip small{ font-size:min(11px, 2.3cqw); margin-top:5px; letter-spacing:-0.04em; white-space:nowrap; overflow:hidden }
