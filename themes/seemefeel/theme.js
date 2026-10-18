@@ -105,12 +105,12 @@ export default {
     {id:'original', name:'오리지널', css:'none'},
     {id:'tone',     name:'스크린톤', css:'grayscale(1) contrast(1.18)'},
   ],
-  frames: [ // layout: 캔버스·컷 배치 / cast: 어떤 출연자 그림을 세울지. name은 칩에 HTML로 들어간다(줄바꿈·작은 글씨)
-    {id:'wide-i', name:'일러스트<br>와이드 버-전',            layout:'wide', cast:'illust',     bg:'#0a0a0a', txt:RED},
-    {id:'tall-i', name:'일러스트<br>세로 버-전',              layout:'tall', cast:'illust',     bg:'#0a0a0a', txt:RED},
-    {id:'tall-p', name:'심의필<br>버-전',                     layout:'tall', cast:'photo',      paper:true, bg:'#f7f6f2', txt:RED}, // paper: 꽃 대신 흰 종이 + 도장
-    {id:'tall-g', name:'심의필<br><small>스페-샬 게스트</small>',   layout:'tall', cast:'photoGuest', paper:true, bg:'#f7f6f2', txt:RED}, // 4컷에 김간지
-    {id:'tall-g2',name:'심의미필<br><small>스페-샬 게스트</small>', layout:'tall', cast:'photoGuestM', paper:true, bg:'#f7f6f2', txt:RED,
+  frames: [ // layout: 캔버스·컷 배치 / cast: 어떤 출연자 그림을 세울지. name은 칩에 한 줄로 들어간다
+    {id:'wide-i', name:'일러스트 와이드 버-전',            layout:'wide', cast:'illust',     bg:'#0a0a0a', txt:RED},
+    {id:'tall-i', name:'일러스트 세로 버-전',              layout:'tall', cast:'illust',     bg:'#0a0a0a', txt:RED},
+    {id:'tall-p', name:'심의필 버-전',                     layout:'tall', cast:'photo',      paper:true, bg:'#f7f6f2', txt:RED}, // paper: 꽃 대신 흰 종이 + 도장
+    {id:'tall-g', name:'심의필 스페-샬 게스트 버-전',   layout:'tall', cast:'photoGuest', paper:true, bg:'#f7f6f2', txt:RED}, // 4컷에 김간지
+    {id:'tall-g2',name:'심의미필 스페-샬 게스트 버-전', layout:'tall', cast:'photoGuestM', paper:true, bg:'#f7f6f2', txt:RED,
      stamp:{key:'stamp2', w:860, cx:600}}, // 눈 모자이크 + 심의미필 도장(가로가 길어 폭·중심을 따로 준다)
   ],
 
