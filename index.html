@@ -63,6 +63,17 @@
   .preview-wrap{display:flex; justify-content:center; margin-top:4px}
   #preview{height:300px; max-width:100%; border:1px solid var(--line); background:var(--accent)}
 
+  /* 미리보기 옆 배치(테마 preview:'side') — 왼쪽 열에 패널+START, 오른쪽 열에 미리보기. 세로 아이패드 한 화면에 다 들어가 스크롤이 없다 */
+  body[data-preview="side"] .capmain{display:grid; grid-template-columns:minmax(0,1fr) 300px; grid-template-rows:auto 1fr auto;
+    grid-template-areas:"head head" "panel pv" "btn pv"; column-gap:20px; max-width:none; width:100%; align-items:start}
+  body[data-preview="side"] .capmain>header{grid-area:head}
+  body[data-preview="side"] .capmain>.panel:not(#pv){grid-area:panel}
+  body[data-preview="side"] #shoot{grid-area:btn; align-self:end; max-width:none}
+  body[data-preview="side"] #pv{grid-area:pv}
+  body[data-preview="side"] #pv .lab{margin-top:0}
+  body[data-preview="side"] #preview{width:100%; height:auto}
+  @media(max-width:600px){ body[data-preview="side"] .capmain{grid-template-columns:minmax(0,1fr); grid-template-areas:"head" "panel" "pv" "btn"; row-gap:18px} }
+
   /* 좌 브랜드 컬럼 + 우 콘텐츠. 테마가 brand를 안 주면 컬럼은 사라진다 */
   .capwrap{display:flex; gap:32px; align-items:flex-start; justify-content:center; width:100%; max-width:900px; margin:0 auto}
   .brand{flex:0 0 280px; display:flex; flex-direction:column; align-items:center; gap:16px}
@@ -111,8 +122,10 @@
     <p class="lab">문구</p>
     <div class="row" id="phrases"></div>
 
-    <p class="lab">미리보기</p>
-    <div class="preview-wrap"><canvas id="preview"></canvas></div>
+    <div id="pv">
+      <p class="lab">미리보기</p>
+      <div class="preview-wrap"><canvas id="preview"></canvas></div>
+    </div>
   </div>
   <button class="btn btn-go full" id="shoot">START</button>
     </div>
@@ -148,7 +161,7 @@ const SHOTS=4, PW=400, PH=267, PAD=24, GAP=14, FOOT=82, DPR=3;
 
 // ── 테마 로드 ──────────────────────────────────────────────────────
 // ?theme=<폴더명> → themes/<폴더명>/theme.js. 없거나 못 읽으면 base로 떨어진다.
-// 테마 계약: {name, slug, frames:[{id,name,sub?,color?,bg,txt}], phrases:[], css?}
+// 테마 계약: {name, slug, frames:[{id,name,sub?,color?,bg,txt}], phrases:[], css?, preview?:'side'}
 const THEME_ID=new URLSearchParams(location.search).get('theme')||'base';
 const asset=p=>`themes/${THEME_ID}/${p}`; // 테마 폴더 기준으로 경로 해석
 let T, themeErr=false;
@@ -163,6 +176,8 @@ for(const [k,path] of Object.entries(T.images||{})){ const i=new Image(); i.src=
 if(T.brand?.length) document.querySelectorAll('.brand').forEach(el=>
   el.innerHTML=T.brand.map(p=>`<img src="${asset(p)}" alt="">`).join(''));
 if(themeErr) document.querySelector('#capScreen .tag').textContent=`'${THEME_ID}' 테마를 못 찾아 기본 테마로 엽니다`;
+// 테마가 preview:'side'면 미리보기를 패널 밖으로 꺼내 오른쪽 열에 세운다(CSS는 위 data-preview 규칙)
+if(T.preview==='side'){ const pv=document.getElementById('pv'); pv.classList.add('panel'); pv.closest('.capmain').append(pv); document.body.dataset.preview='side'; }
 
 const FX=T.filters||FILTERS;   // 테마가 자기 필터를 주면 그걸 쓴다(기본 목록은 건드리지 않는다)
 let filter=FX[0], frame=T.frames[0], phrase=T.phrases?.[0]||'', shots=[];
@@ -226,7 +241,8 @@ function snap(){
 
 let busy=false;
 function updatePreview(){
-  if(busy || !video.videoWidth) return;
+  if(busy) return;
+  if(!video.videoWidth){ compose($('preview'), []); return; } // 카메라가 뜨기 전(또는 거부)엔 빈 컷으로 프레임만 보여준다
   const s=snap();
   compose($('preview'), Array(SHOTS).fill(s));
 }

@@ -28,6 +28,7 @@ open http://localhost:8787/?theme=<이름>
 | `name` | O | `<title>`과 화면 헤더 |
 | `slug` | | 저장 파일명 접두사 (기본 `photobooth`) |
 | `frames` | O | `{id, name, sub?, color?, bg, txt}` 배열. 스트립 배경색과 글자색. `sub`는 칩 둘째 줄(작게), `color`는 칩 색 |
+| `preview` | X | `'side'`면 미리보기를 오른쪽 열에 세운다(세로 아이패드 한 화면). 없으면 패널 안 아래 |
 | `phrases` | O | 문구 칩. 첫 항목이 기본값, `''`는 문구 없음 |
 | `css` | | 이 폴더의 CSS를 덧씌운다 (폰트·색·장식) |
 

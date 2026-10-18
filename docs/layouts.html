@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>심의필 포토부스 — 아이패드 화면 배치 3안</title>
+<!-- 고객 공유용 비교 페이지. 실제 테마 파일(../themes/seemefeel)을 그대로 불러 그리므로 프레임이 바뀌면 여기도 같이 바뀐다. -->
+<style>
+@font-face{font-family:"BookkMyungjo";font-weight:700;src:url("../themes/seemefeel/assets/bookk-myungjo-bold.ttf") format("truetype")}
+@font-face{font-family:"BookkMyungjo";font-weight:300;src:url("../themes/seemefeel/assets/bookk-myungjo-light.ttf") format("truetype")}
+*{box-sizing:border-box}
+:root{--s:.5} /* 아이패드 축소 비율 — 아래 스크립트가 창 폭에 맞춰 다시 정한다(폰에서는 더 작게, 크게 보기는 1까지) */
+body{margin:0;background:#e9e7e1;color:#141414;font-family:Pretendard,-apple-system,"Apple SD Gothic Neo",sans-serif;padding:24px 20px 80px;-webkit-text-size-adjust:100%}
+h1{font-size:21px;margin:0 0 6px}
+.intro{font-size:14px;color:#555;margin:0 0 18px;line-height:1.6;max-width:760px}
+.tw{overflow-x:auto;margin:0 0 36px}
+table{border-collapse:collapse;font-size:13px;background:#fff;white-space:nowrap}
+td,th{border:1px solid #cfcdc6;padding:7px 12px;text-align:left}
+th{background:#f3f2ee;font-weight:600}
+td.y{color:#1a7f37;font-weight:600} td.n{color:#ca2b22;font-weight:600}
+section{display:flex;gap:28px;align-items:flex-start;margin-bottom:56px;flex-wrap:wrap}
+.desc{flex:0 0 330px;max-width:100%}
+.desc h2{font-size:20px;margin:0 0 4px}
+.desc h2 b{display:inline-block;width:28px;height:28px;line-height:28px;text-align:center;background:#141414;color:#fff;margin-right:8px;font-size:15px;border-radius:4px}
+.desc p{font-size:13.5px;line-height:1.65;color:#333;margin:10px 0}
+.desc ul{font-size:13px;line-height:1.6;color:#333;padding-left:18px;margin:6px 0}
+.desc li.m{color:#9a4b2a}
+.desc a{font-size:12px;color:#555}
+.pads{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+.pad{width:calc(844px*var(--s));height:calc(1204px*var(--s));position:relative;margin-bottom:28px}
+.pad .cap{position:absolute;left:0;bottom:-22px;font-size:12px;color:#666;white-space:nowrap}
+.frame{transform:scale(var(--s));transform-origin:top left;width:844px;height:1204px;border:12px solid #1b1b1b;border-radius:30px;background:#1b1b1b;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+body.big section{display:none} body.big section.show{display:flex}
+
+/* ── 아이패드 화면 — 앱 CSS·테마 그대로 ── */
+.ipad{width:820px;height:1180px;position:relative;overflow:hidden;border-radius:18px;
+  background:#f6f5f1 url("../themes/seemefeel/assets/floral.jpg") center top/cover no-repeat;
+  font-family:"BookkMyungjo",serif;font-weight:700;letter-spacing:-0.05em;color:#141414;padding:32px 24px 40px;display:flex;flex-direction:column}
+.logo{height:118px;width:340px;margin:0 auto 32px;flex:none;
+  background:url("../themes/seemefeel/assets/logo-black.png") center top/auto 84px no-repeat,url("../themes/seemefeel/assets/copy.png") center bottom/330px auto no-repeat}
+.logo.sm{height:52px;width:200px;margin-bottom:0;background:url("../themes/seemefeel/assets/logo-black.png") center/contain no-repeat}
+.yt{margin-top:auto;width:120px;height:24px;flex:none;align-self:center;background:url("../themes/seemefeel/assets/yt.png") center/contain no-repeat}
+.panel{background:#fff;border:3px solid #141414;padding:20px;display:flex;flex-direction:column}
+.stage{position:relative;width:100%;aspect-ratio:3/2;border:1px solid #141414;overflow:hidden;flex:none;
+  background:radial-gradient(ellipse at 50% 35%,#55534f 0%,#2a2928 60%,#161616 100%)}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%}
+.ipad[data-filter="tone"] .stage canvas{background:
+  radial-gradient(circle,rgba(8,8,8,.55) 1px,transparent 1.45px) 0 0/4px 4px,
+  radial-gradient(circle,rgba(8,8,8,.55) 1px,transparent 1.45px) 2px 2px/4px 4px}
+.live{position:absolute;top:14px;left:14px;font-size:14px;letter-spacing:.25em;color:#fff;background:rgba(0,0,0,.55);padding:6px 13px}
+.count{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:140px;color:#fff;text-shadow:0 4px 40px rgba(0,0,0,.7);background:rgba(0,0,0,.2)}
+.lab{font-size:12px;color:#7c756c;margin:22px 0 11px}
+.lab.first{margin-top:0}
+.row{display:flex;gap:9px;flex-wrap:wrap}
+.chip{flex:1 1 0;min-width:80px;background:#fff;border:2px solid var(--chip,#141414);color:var(--chip,#141414);
+  padding:14px 8px;font-size:15px;font-family:inherit;font-weight:700;letter-spacing:inherit;text-align:center;cursor:pointer;line-height:1.2}
+.chip[aria-pressed="true"]{color:#fff;background:var(--chip,#141414)}
+.chip small{display:block;font-size:11px;margin-top:5px;white-space:nowrap;letter-spacing:-0.04em;overflow:hidden}
+.frames{gap:20px}.frames .chip{flex:1 1 45%;padding:12px 6px}
+.btn{display:block;width:100%;padding:18px;border:none;background:#ca2b22;color:#fff;font:inherit;font-size:17px;letter-spacing:.02em;cursor:pointer;text-align:center;flex:none}
+.btn.ghost{background:#fff;color:#141414;border:2px solid #141414;margin-top:10px}
+.pv{align-items:center}
+.pv canvas{border:2px solid #141414;width:100%;height:auto}
+.cols{display:flex;gap:20px;align-items:stretch;flex:none}
+.col{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:18px}
+.col .btn{margin-top:auto}
+.hint{margin-top:auto;font-size:13px;line-height:1.7;color:#7c756c;font-weight:300;border-top:1px solid #e3e1dc;padding-top:14px}
+/* B — 위·아래 고정, 가운데만 스크롤 */
+.ipad.scroll{padding:0;overflow-y:auto;scrollbar-width:none;display:block}
+.pin{position:sticky;z-index:2;background:rgba(246,245,241,.97);padding:0 24px}
+.pin.top{top:0;padding-top:24px;padding-bottom:14px;border-bottom:3px solid #141414}
+.pin.bot{bottom:0;padding-top:14px;padding-bottom:24px;border-top:3px solid #141414}
+.mid{display:flex;gap:20px;padding:18px 24px}
+/* C — 고르기 화면은 칩을 크게, 촬영 화면은 라이브뷰 전체 */
+.big-chips .chip{padding:19px 8px;font-size:19px}
+.big-chips .chip small{font-size:13px;margin-top:6px}
+.big-chips .lab{font-size:14px}
+.slots{display:flex;gap:12px;margin:18px 0;flex:none}
+.slot{flex:1;aspect-ratio:3/2;border:2px solid #141414;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;color:#c9c5bd}
+.slot.on{background:#bdbdbd;color:#141414}
+.gallery{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+.gallery figure{margin:0;text-align:center;font-size:12px;color:#555}
+.gallery canvas{height:min(520px, 60vw);width:auto;display:block;margin-bottom:6px;border:1px solid #bbb}
+</style>
+</head>
+<body>
+<h1>심의필 포토부스 — 아이패드 화면 배치 3안</h1>
+<p class="intro">세로로 세운 아이패드(820×1180) 기준입니다. 실제 포토부스 디자인 그대로 그렸고 카메라 자리만 회색입니다(반투명 출연자 가이드는 실제 동작). 프레임 버튼을 누르면 오른쪽 미리보기가 바뀝니다. 각 안의 “크게 보기”를 누르면 실제 크기로 볼 수 있어요.</p>
+<div class="tw"><table>
+<tr><th></th><th>기존 (한 열)</th><th>A 좌우 2단</th><th>B 위아래 고정</th><th>C 두 화면</th></tr>
+<tr><th>라이브 카메라 폭</th><td>514px</td><td>~430px</td><td>560px</td><td>772px (촬영 화면)</td></tr>
+<tr><th>완성 미리보기 폭</th><td>139px</td><td>~255px</td><td>~210px</td><td>~275px</td></tr>
+<tr><th>START 누를 때 카메라</th><td class="n">화면 밖 — 스크롤 필요</td><td class="y">같은 화면</td><td class="y">항상 위에 고정</td><td class="y">촬영 화면 전체</td></tr>
+<tr><th>스크롤</th><td class="n">있음</td><td class="y">없음</td><td class="y">없음 (프레임이 늘어도 위·아래 고정)</td><td class="y">없음</td></tr>
+<tr><th>찍기까지 터치</th><td>1번</td><td>1번</td><td>1번</td><td>2번 (START → 자리 잡고 → 촬영)</td></tr>
+</table></div>
+
+<section data-opt="A">
+  <div class="desc">
+    <h2><b>A</b>좌우 2단</h2>
+    <p>왼쪽에 라이브 카메라·필터·프레임·START, 오른쪽에 완성 미리보기를 세로로 길게. 한 화면에 전부 들어가 스크롤이 없고, START를 누르면 바로 위 카메라에서 카운트다운이 돕니다.</p>
+    <ul>
+      <li>미리보기가 기존의 1.8배 폭 — 출연자와 도장이 보입니다</li>
+      <li>고르고 → 누르고 → 찍히는 흐름이 한 화면 안에</li>
+      <li class="m">라이브 카메라는 기존보다 조금 작아집니다 (514 → 430)</li>
+    </ul>
+    <a href="?big=A">크게 보기 ↗</a>
+  </div>
+  <div class="pads">
+    <div class="pad"><div class="frame">
+      <div class="ipad" data-def="3">
+        <div class="logo"></div>
+        <div class="cols">
+          <div class="col">
+            <div class="panel">
+              <div class="stage"><canvas class="guide"></canvas><div class="live">● LIVE</div></div>
+              <p class="lab">필터</p><div class="row filters"></div>
+              <p class="lab">프레임</p><div class="row frames"></div>
+            </div>
+            <button class="btn">START</button>
+          </div>
+          <div class="panel pv" style="flex:0 0 300px"><p class="lab first">미리보기</p><canvas class="strip"></canvas></div>
+        </div>
+        <div class="yt"></div>
+      </div>
+    </div><div class="cap">A — 한 화면, 스크롤 없음</div></div>
+  </div>
+</section>
+
+<section data-opt="B">
+  <div class="desc">
+    <h2><b>B</b>위아래 고정 (뷰파인더형)</h2>
+    <p>로고와 라이브 카메라를 화면 위에, START를 아래에 고정하고 가운데(필터·프레임·미리보기)만 스크롤되는 카메라 앱 구조. 프레임이 10개가 돼도 카메라와 START는 늘 보입니다.</p>
+    <ul>
+      <li>카메라가 가장 크고(560) 눈높이에 고정</li>
+      <li>START가 항상 손 닿는 맨 아래</li>
+      <li class="m">미리보기는 A보다 조금 좁습니다 (~210)</li>
+      <li class="m">위·아래 띠가 화면의 절반이라 가운데가 좁습니다</li>
+    </ul>
+    <a href="?big=B">크게 보기 ↗</a>
+  </div>
+  <div class="pads">
+    <div class="pad"><div class="frame">
+      <div class="ipad scroll" data-def="3">
+        <div class="pin top">
+          <div class="logo sm"></div>
+          <div class="stage" style="width:560px;margin:14px auto 0"><canvas class="guide"></canvas><div class="live">● LIVE</div></div>
+        </div>
+        <div class="mid">
+          <div class="panel" style="flex:1">
+            <p class="lab first">필터</p><div class="row filters"></div>
+            <p class="lab">프레임</p><div class="row frames"></div>
+          </div>
+          <div class="panel pv" style="flex:0 0 258px"><p class="lab first">미리보기</p><canvas class="strip"></canvas></div>
+        </div>
+        <div class="pin bot"><button class="btn">START</button></div>
+      </div>
+    </div><div class="cap">B — 위·아래 고정, 가운데만 스크롤</div></div>
+  </div>
+</section>
+
+<section data-opt="C">
+  <div class="desc">
+    <h2><b>C</b>두 화면 (고르기 → 촬영)</h2>
+    <p>첫 화면은 고르기 전용: 큰 버튼과 가장 큰 미리보기. START를 누르면 촬영 화면으로 넘어가 카메라가 화면 폭을 다 씁니다. 자리 잡을 시간을 주기 위해 촬영 화면에서 한 번 더 “촬영 시작”을 누릅니다.</p>
+    <ul>
+      <li>카메라·미리보기 둘 다 가장 큽니다 — 멀리서도 보여요</li>
+      <li>버튼이 커서 여럿이 서서 고르기 편합니다</li>
+      <li class="m">터치가 한 번 늘어납니다 (5초 카운트 자동 시작으로 바꿀 수도)</li>
+    </ul>
+    <a href="?big=C">크게 보기 ↗</a>
+  </div>
+  <div class="pads">
+    <div class="pad"><div class="frame">
+      <div class="ipad" data-def="3">
+        <div class="logo"></div>
+        <div class="cols">
+          <div class="panel big-chips" style="flex:1">
+            <p class="lab first">필터</p><div class="row filters"></div>
+            <p class="lab">프레임</p><div class="row frames"></div>
+            <div class="hint">프레임을 고르고 START —<br>다음 화면에서 자리를 잡은 뒤 촬영이 시작돼요.</div>
+          </div>
+          <div class="panel pv" style="flex:0 0 322px"><p class="lab first">미리보기</p><canvas class="strip"></canvas></div>
+        </div>
+        <button class="btn" style="margin-top:18px">START</button>
+        <div class="yt"></div>
+      </div>
+    </div><div class="cap">C-1 고르기 화면</div></div>
+    <div class="pad"><div class="frame">
+      <div class="ipad" data-def="3" style="padding-top:24px">
+        <div class="logo sm"></div>
+        <div class="stage" style="margin-top:14px"><canvas class="guide"></canvas><div class="live">1 / 4</div><div class="count">3</div></div>
+        <div class="slots"><div class="slot on">1</div><div class="slot">2</div><div class="slot">3</div><div class="slot">4</div></div>
+        <button class="btn">촬영 시작</button>
+        <button class="btn ghost">프레임 다시 고르기</button>
+        <div class="yt"></div>
+      </div>
+    </div><div class="cap">C-2 촬영 화면 (START 뒤)</div></div>
+  </div>
+</section>
+
+<section data-opt="G">
+  <div class="desc">
+    <h2>참고 — 프레임 5종</h2>
+    <p>일러스트 2종, 심의필 2종(흰 종이 + 빨간 도장), 심의미필 1종(빨간 종이 + 흰 도장, 눈 모자이크). 사진 자리는 회색입니다.</p>
+  </div>
+  <div class="gallery" id="gallery"></div>
+</section>
+
+<script type="module">
+import T from '../themes/seemefeel/theme.js';
+const IMG={};
+await Promise.all(Object.entries(T.images).map(([k,p])=>new Promise(r=>{const i=new Image(); i.onload=i.onerror=r; i.src='../themes/seemefeel/'+p; IMG[k]=i;})));
+await document.fonts.ready;
+const FR=T.frames, FX=T.filters;
+const label=t=>t.sub?`${t.name}<small>${t.sub}</small>`:t.name;
+function chips(host,list,onPick,sel=0){
+  host.innerHTML='';
+  list.forEach((t,i)=>{ const b=document.createElement('button'); b.className='chip'; b.setAttribute('aria-pressed',i===sel); b.innerHTML=label(t);
+    if(t.color) b.style.setProperty('--chip',t.color);
+    b.onclick=()=>{ [...host.children].forEach((c,j)=>c.setAttribute('aria-pressed',j===i)); onPick(t); }; host.appendChild(b); });
+}
+const g=(frame,filter)=>({frame,filter,phrase:'',date:'',img:IMG,letterSpace:s=>s});
+document.querySelectorAll('.ipad').forEach(ip=>{
+  let frame=FR[+ip.dataset.def||0], filter=FX[0];
+  const draw=()=>{
+    ip.dataset.filter=filter.id;
+    ip.querySelectorAll('canvas.strip').forEach(cv=>T.compose(cv,[],g(frame,filter)));
+    ip.querySelectorAll('canvas.guide').forEach(c=>{ c.width=c.offsetWidth*2; c.height=c.offsetHeight*2; const x=c.getContext('2d'); x.clearRect(0,0,c.width,c.height); T.guide(x,{i:0,W:c.width,H:c.height,frame,img:IMG}); });
+  };
+  ip.querySelectorAll('.filters').forEach(h=>chips(h,FX,t=>{filter=t;draw();}));
+  ip.querySelectorAll('.frames').forEach(h=>chips(h,FR,t=>{frame=t;draw();},+ip.dataset.def||0));
+  draw();
+});
+const gal=document.getElementById('gallery');
+FR.forEach(f=>{ const fig=document.createElement('figure'); const cv=document.createElement('canvas'); T.compose(cv,[],g(f,FX[0])); fig.appendChild(cv); fig.insertAdjacentHTML('beforeend',`${f.name} ${f.sub||''}`); gal.appendChild(fig); });
+const big=new URLSearchParams(location.search).get('big');
+if(big){ document.body.classList.add('big'); document.querySelector(`section[data-opt="${big}"]`)?.classList.add('show'); }
+const fit=()=>document.documentElement.style.setProperty('--s', Math.min(big?1:.5, (document.documentElement.clientWidth-40)/844)); // 아이패드가 창 폭을 넘지 않게
+addEventListener('resize',fit); fit();
+</script>
+</body>
+</html>

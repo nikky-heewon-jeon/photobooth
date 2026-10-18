@@ -96,6 +96,7 @@ export default {
   name: '심의필',
   slug: 'seemefeel',
   css: 'theme.css',
+  preview: 'side', // 세로 아이패드 한 화면: 왼쪽 라이브뷰·칩·START, 오른쪽 미리보기 (스크롤 없음)
   images: { frame:'assets/frame.jpg',
             cha:'assets/cha.png',   kim:'assets/kim.png',   pd:'assets/pd.png',      // 일러스트
             pcha:'assets/pcha.webp', pkim:'assets/pkim.webp', ppd:'assets/ppd.webp', pgan:'assets/pgan.webp', // 실사 누끼
