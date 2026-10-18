@@ -10,6 +10,12 @@ const WIDE=(()=>{ const L=90,R=F.w-90,top=84,bot=1330,gap=22,w=R-L,h=Math.floor(
 // 세로 스트립 — 꽃 지면을 거울 반복해 늘리고 로고 밴드를 바닥에 고정, 3:2 4컷
 const TALL=(()=>{ const pad=56,gap=28,w=F.fx1-F.fx0-pad*2,h=Math.round(w/1.5),bodyH=pad+4*h+3*gap+pad;
   return {W:F.w, H:F.fy0+bodyH+(F.h-F.floral1), bodyH, rects:[0,1,2,3].map(i=>[F.fx0+pad,F.fy0+pad+i*(h+gap),w,h])}; })();
+// 흰 종이 프레임(실사용) — 같은 컷 배치에 바탕만 종이, 하단에 도장 하나를 사선으로
+const PTALL=(()=>{ const r=TALL.rects.map(([x,y,w,h])=>[x,y,w,h]); const last=r[3];
+  return {W:F.w, H:last[1]+last[3]+300, rects:r, stamp:{cx:F.w/2+90, cy:last[1]+last[3]+20, w:760, deg:-15}}; })();
+const PWIDE={W:F.w, H:F.h, rects:WIDE.rects, stamp:{cx:F.w/2, cy:1620, w:560, deg:-7}};
+const LAYOUT={ floral:{wide:WIDE, tall:TALL}, paper:{wide:PWIDE, tall:PTALL} };
+
 // 컷별 출연자 배치 — side 설 자리 · scale 컷 높이 대비 · down 아래로 내림(음수면 위로) · anchor 기준변. 4컷은 팬만.
 // 팬은 출연자가 몸을 기울이거나 손짓하는 쪽(비어 있는 쪽)에 선다.
 const PLAN={
@@ -39,6 +45,19 @@ function tone(x){ // 망점 — 6px 타일 한 번 만들어 재사용
   const q=c.getContext('2d'); q.fillStyle='rgba(8,8,8,.55)';
   q.beginPath(); q.arc(1.5,1.5,1.5,0,7); q.arc(4.5,4.5,1.5,0,7); q.fill();
   return _tone=x.createPattern(c,'repeat');
+}
+const _paper={};
+function paperBg(x,W,H){ // 미색 종이 + 옅은 알갱이. 크기별로 한 번만 그려 캐시
+  const k=W+'x'+H; if(!_paper[k]){ const c=document.createElement('canvas'); c.width=W; c.height=H; const q=c.getContext('2d');
+    q.fillStyle='#f7f6f2'; q.fillRect(0,0,W,H); let s=1234; const rnd=()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; };
+    q.fillStyle='rgba(60,50,40,.06)'; for(let i=0;i<Math.round(W*H/450);i++) q.fillRect(rnd()*W,rnd()*H,1+rnd()*1.5,1+rnd()*1.5);
+    _paper[k]=c; }
+  x.drawImage(_paper[k],0,0);
+}
+function seal(x,im,{cx,cy,w,deg}){ // 도장 — multiply로 종이에 스민 느낌
+  const h=w*im.naturalHeight/im.naturalWidth;
+  x.save(); x.translate(cx,cy); x.rotate(deg*Math.PI/180); x.globalAlpha=.94; x.globalCompositeOperation='multiply';
+  x.drawImage(im,-w/2,-h/2,w,h); x.restore();
 }
 function cover(x,img,dx,dy,dw,dh){ // 비율 유지하고 가운데를 채운다
   const s=Math.max(dw/img.width,dh/img.height), cw=dw/s, ch=dh/s;
@@ -71,7 +90,8 @@ export default {
   css: 'theme.css',
   images: { frame:'assets/frame.jpg',
             cha:'assets/cha.png',   kim:'assets/kim.png',   pd:'assets/pd.png',      // 일러스트
-            pcha:'assets/pcha.webp', pkim:'assets/pkim.webp', ppd:'assets/ppd.webp' }, // 실사 누끼
+            pcha:'assets/pcha.webp', pkim:'assets/pkim.webp', ppd:'assets/ppd.webp',   // 실사 누끼
+            stamp:'assets/stamp.png' },                                                 // 도장 로고(종이 프레임용)
   filters: [
     {id:'original', name:'오리지널', css:'none'},
     {id:'tone',     name:'스크린톤', css:'grayscale(1) contrast(1.18)'},
@@ -79,17 +99,17 @@ export default {
   frames: [ // layout: 캔버스·컷 배치 / cast: 어떤 출연자 그림을 세울지
     {id:'wide-i', name:'와이드 일러스트', layout:'wide', cast:'illust', bg:'#0a0a0a', txt:RED},
     {id:'tall-i', name:'세로 일러스트',   layout:'tall', cast:'illust', bg:'#0a0a0a', txt:RED},
-    {id:'wide-p', name:'와이드 실사',     layout:'wide', cast:'photo',  bg:'#0a0a0a', txt:RED},
-    {id:'tall-p', name:'세로 실사',       layout:'tall', cast:'photo',  bg:'#0a0a0a', txt:RED},
+    {id:'wide-p', name:'와이드 실사',     layout:'wide', cast:'photo',  paper:true, bg:'#f7f6f2', txt:RED}, // paper: 꽃 대신 흰 종이 + 도장
+    {id:'tall-p', name:'세로 실사',       layout:'tall', cast:'photo',  paper:true, bg:'#f7f6f2', txt:RED},
   ],
 
   // 스트립 전체를 그린다 — 캔버스 크기·배경·컷·출연자·테두리
   compose(cv, shots, g){
     const fr=g.img.frame;
     if(!ready(fr)){ cv.width=9; cv.height=16; return; } // 프레임 이미지 로딩 전
-    const L=g.frame.layout==='wide'?WIDE:TALL, plan=PLAN[g.frame.cast][g.frame.layout];
+    const L=LAYOUT[g.frame.paper?'paper':'floral'][g.frame.layout], plan=PLAN[g.frame.cast][g.frame.layout];
     cv.width=L.W; cv.height=L.H; const x=cv.getContext('2d'); x.imageSmoothingQuality='high';
-    if(g.frame.layout==='wide') x.drawImage(fr,0,0); else tallBg(x,fr);
+    if(g.frame.paper) paperBg(x,L.W,L.H); else if(g.frame.layout==='wide') x.drawImage(fr,0,0); else tallBg(x,fr);
     L.rects.forEach((r,i)=>{
       const s=shots[i];
       if(s) cover(x,s,...r); else { x.fillStyle='#bdbdbd'; x.fillRect(...r); }
@@ -97,11 +117,12 @@ export default {
       const p=plan[i]; if(p && ready(g.img[p.img])) host(x,g.img[p.img],...r,p);
       border(x,...r);
     });
+    if(g.frame.paper && ready(g.img.stamp)) seal(x,g.img.stamp,L.stamp); // 4컷 아래를 물고 찍힌 도장
   },
 
   // 라이브뷰 가이드 — 이 컷에 실제로 담기는 띠만 밝게, 출연자를 반투명으로 제자리에
   guide(x, g){
-    const L=g.frame.layout==='wide'?WIDE:TALL, [,,cw,ch]=L.rects[g.i];
+    const L=LAYOUT[g.frame.paper?'paper':'floral'][g.frame.layout], [,,cw,ch]=L.rects[g.i];
     const bh=Math.min(g.H, g.W/(cw/ch)), by=(g.H-bh)/2;   // 3:2 라이브뷰를 컷 비율로 가운데 자른 띠
     if(bh<g.H-1){ x.fillStyle='rgba(0,0,0,.55)'; x.fillRect(0,0,g.W,by); x.fillRect(0,by+bh,g.W,g.H-by-bh); }
     const p=PLAN[g.frame.cast][g.frame.layout][g.i], im=p&&g.img[p.img];
