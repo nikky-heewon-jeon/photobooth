@@ -10,14 +10,25 @@ const WIDE=(()=>{ const L=90,R=F.w-90,top=84,bot=1330,gap=22,w=R-L,h=Math.floor(
 // 세로 스트립 — 꽃 지면을 거울 반복해 늘리고 로고 밴드를 바닥에 고정, 3:2 4컷
 const TALL=(()=>{ const pad=56,gap=28,w=F.fx1-F.fx0-pad*2,h=Math.round(w/1.5),bodyH=pad+4*h+3*gap+pad;
   return {W:F.w, H:F.fy0+bodyH+(F.h-F.floral1), bodyH, rects:[0,1,2,3].map(i=>[F.fx0+pad,F.fy0+pad+i*(h+gap),w,h])}; })();
-// 컷별 출연자 배치 — side 설 자리 · scale 컷 높이 대비 · down 아래로 내림 · anchor 기준변. 4컷은 팬만.
+// 컷별 출연자 배치 — side 설 자리 · scale 컷 높이 대비 · down 아래로 내림(음수면 위로) · anchor 기준변. 4컷은 팬만.
+// 팬은 출연자가 몸을 기울이거나 손짓하는 쪽(비어 있는 쪽)에 선다.
 const PLAN={
-  wide:[{img:'cha',side:'R',scale:1.55,down:.04,anchor:'top'},
-        {img:'kim',side:'C',scale:1.55,down:.03,anchor:'top'},
-        {img:'pd', side:'L',scale:1.35,down:.04,anchor:'top'}, null],
-  tall:[{img:'cha',side:'R',scale:1.20,down:.16},
-        {img:'kim',side:'C',scale:0.95,down:.14},
-        {img:'pd', side:'L',scale:0.94,down:.12}, null],
+  illust:{ // 반신 일러스트
+    wide:[{img:'cha',side:'R',scale:1.55,down:.04,anchor:'top'},
+          {img:'kim',side:'C',scale:1.55,down:.03,anchor:'top'},
+          {img:'pd', side:'L',scale:1.35,down:.04,anchor:'top'}, null],
+    tall:[{img:'cha',side:'R',scale:1.20,down:.16},
+          {img:'kim',side:'C',scale:0.95,down:.14},
+          {img:'pd', side:'L',scale:0.94,down:.12}, null],
+  },
+  photo:{  // 전신 실사 — 위를 기준으로 세우고 아래(다리)는 컷 밖으로. 사람 키 느낌이 나는 배율
+    wide:[{img:'pcha',side:'R',scale:3.2,down:-.02,anchor:'top'},   // 차승우: 왼쪽으로 기울여 손짓 → 오른쪽에
+          {img:'pkim',side:'L',scale:3.2,down:-.02,anchor:'top'},   // 김윤주: 오른쪽으로 손짓 → 왼쪽에
+          {img:'ppd', side:'R',scale:3.2,down:-.35,anchor:'top'}, null], // 김은하: 팔을 왼쪽 위로 → 오른쪽에, 팔은 컷 위로
+    tall:[{img:'pcha',side:'R',scale:1.7,down:0,anchor:'top'},
+          {img:'pkim',side:'L',scale:1.7,down:0,anchor:'top'},
+          {img:'ppd', side:'R',scale:1.7,down:-.12,anchor:'top'}, null],
+  },
 };
 
 const ready=im=>im&&im.complete&&im.naturalWidth>0;
@@ -58,38 +69,42 @@ export default {
   name: '심의필',
   slug: 'seemefeel',
   css: 'theme.css',
-  images: { frame:'assets/frame.jpg', cha:'assets/cha.png', kim:'assets/kim.png', pd:'assets/pd.png' },
+  images: { frame:'assets/frame.jpg',
+            cha:'assets/cha.png',   kim:'assets/kim.png',   pd:'assets/pd.png',      // 일러스트
+            pcha:'assets/pcha.webp', pkim:'assets/pkim.webp', ppd:'assets/ppd.webp' }, // 실사 누끼
   filters: [
     {id:'original', name:'오리지널', css:'none'},
     {id:'tone',     name:'스크린톤', css:'grayscale(1) contrast(1.18)'},
   ],
-  frames: [
-    {id:'wide', name:'와이드 9:16',  bg:'#0a0a0a', txt:RED},
-    {id:'tall', name:'세로 스트립',  bg:'#0a0a0a', txt:RED},
+  frames: [ // layout: 캔버스·컷 배치 / cast: 어떤 출연자 그림을 세울지
+    {id:'wide-i', name:'와이드 일러스트', layout:'wide', cast:'illust', bg:'#0a0a0a', txt:RED},
+    {id:'tall-i', name:'세로 일러스트',   layout:'tall', cast:'illust', bg:'#0a0a0a', txt:RED},
+    {id:'wide-p', name:'와이드 실사',     layout:'wide', cast:'photo',  bg:'#0a0a0a', txt:RED},
+    {id:'tall-p', name:'세로 실사',       layout:'tall', cast:'photo',  bg:'#0a0a0a', txt:RED},
   ],
 
   // 스트립 전체를 그린다 — 캔버스 크기·배경·컷·출연자·테두리
   compose(cv, shots, g){
     const fr=g.img.frame;
     if(!ready(fr)){ cv.width=9; cv.height=16; return; } // 프레임 이미지 로딩 전
-    const L=g.frame.id==='wide'?WIDE:TALL;
+    const L=g.frame.layout==='wide'?WIDE:TALL, plan=PLAN[g.frame.cast][g.frame.layout];
     cv.width=L.W; cv.height=L.H; const x=cv.getContext('2d'); x.imageSmoothingQuality='high';
-    if(g.frame.id==='wide') x.drawImage(fr,0,0); else tallBg(x,fr);
+    if(g.frame.layout==='wide') x.drawImage(fr,0,0); else tallBg(x,fr);
     L.rects.forEach((r,i)=>{
       const s=shots[i];
       if(s) cover(x,s,...r); else { x.fillStyle='#bdbdbd'; x.fillRect(...r); }
       if(g.filter.id==='tone'){ x.fillStyle=tone(x); x.fillRect(...r); }
-      const p=PLAN[g.frame.id][i]; if(p && ready(g.img[p.img])) host(x,g.img[p.img],...r,p);
+      const p=plan[i]; if(p && ready(g.img[p.img])) host(x,g.img[p.img],...r,p);
       border(x,...r);
     });
   },
 
   // 라이브뷰 가이드 — 이 컷에 실제로 담기는 띠만 밝게, 출연자를 반투명으로 제자리에
   guide(x, g){
-    const L=g.frame.id==='wide'?WIDE:TALL, [,,cw,ch]=L.rects[g.i];
+    const L=g.frame.layout==='wide'?WIDE:TALL, [,,cw,ch]=L.rects[g.i];
     const bh=Math.min(g.H, g.W/(cw/ch)), by=(g.H-bh)/2;   // 3:2 라이브뷰를 컷 비율로 가운데 자른 띠
     if(bh<g.H-1){ x.fillStyle='rgba(0,0,0,.55)'; x.fillRect(0,0,g.W,by); x.fillRect(0,by+bh,g.W,g.H-by-bh); }
-    const p=PLAN[g.frame.id][g.i], im=p&&g.img[p.img];
+    const p=PLAN[g.frame.cast][g.frame.layout][g.i], im=p&&g.img[p.img];
     if(ready(im)){ x.globalAlpha=.5; host(x,im,0,by,g.W,bh,p); x.globalAlpha=1; }
   },
 };
