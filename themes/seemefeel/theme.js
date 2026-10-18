@@ -7,7 +7,7 @@ export default {
   css: 'theme.css',                // 날짜용 타자기 폰트
   images: { logo: 'assets/logo.png' },
   frames: [
-    {id:'black', name:'기본', bg:'#0a0a0a', txt:'#fff'},
+    {id:'black', name:'기본', bg:'#0a0a0a', txt:'#ca2b22'}, // txt = 로고에서 뽑은 빨강
   ],
   // phrases 없음 — 문구 칸을 안 쓴다(엔진이 칸 자체를 숨긴다)
   draw(x, g){
@@ -17,8 +17,7 @@ export default {
       x.drawImage(L, (g.W-lw)/2, g.baseY+30, lw, lh);
     }
     x.fillStyle=g.frame.txt; x.textAlign='center';
-    x.globalAlpha=.45; x.font='400 13px "MomsTypewriter", monospace';
+    x.font='400 13px "MomsTypewriter", monospace'; // 로고 빨강 그대로 — 검정 위에서 흐려지지 않게 알파를 뺐다
     x.fillText(g.letterSpace(g.date,1), g.W/2, g.baseY+152);
-    x.globalAlpha=1;
   },
 };
