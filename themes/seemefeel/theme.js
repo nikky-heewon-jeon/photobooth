@@ -33,10 +33,11 @@ const PLAN={
   },
 };
 // 스페셜 게스트 버전 — 1~3컷은 같고, 4컷에 김간지(오른쪽 끝, 팬은 왼쪽)
-PLAN.photoGuest={ tall:[...PLAN.photo.tall.slice(0,3), {img:'pgan',side:'R',scale:1.9,down:.06,anchor:'top'}] };
-// 심의미필 버전 — 같은 배치, 눈에 모자이크를 미리 구워 둔 사진(m*)으로
-PLAN.photoGuestM={ tall:PLAN.photoGuest.tall.map(p=>p&&{...p, img:'m'+p.img.slice(1)}) };
-PLAN.photoGuestM.tall[3].censor=[[-25,172,120,120,18],[272,200,120,120,18]]; // 김간지 양손 — 손가락·주먹 주변까지 정사각형(그림 px 기준, 마지막은 블록 크기). 합성 때 뒤의 사진째 굵게 모자이크해 손짓이 안 읽히게
+PLAN.photoGuest={ tall:[...PLAN.photo.tall.slice(0,3), {img:'pgan',side:'R',scale:1.9,down:.14,anchor:'top'}] }; // 하트 포즈는 조금 더 내려 선다
+// 심의미필 버전 — 1~3컷은 같은 배치에 눈 모자이크를 구워 둔 사진(m*), 4컷은 다른 포즈(가운뎃손가락)라 자리도 따로
+PLAN.photoGuestM={ tall:[...PLAN.photoGuest.tall.slice(0,3).map(p=>({...p, img:'m'+p.img.slice(1)})),
+  {img:'mgan',side:'R',scale:1.9,down:.06,anchor:'top',
+   censor:[[-25,172,120,120,18],[272,200,120,120,18]]}] }; // 양손 — 손가락·주먹 주변까지 정사각형(그림 px 기준, 마지막은 블록 크기). 합성 때 뒤의 사진째 굵게 모자이크해 손짓이 안 읽히게
 
 const ready=im=>im&&im.complete&&im.naturalWidth>0;
 let _tone=null;
