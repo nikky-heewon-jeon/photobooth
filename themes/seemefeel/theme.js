@@ -34,6 +34,8 @@ const PLAN={
 };
 // 스페셜 게스트 버전 — 1~3컷은 같고, 4컷에 김간지(오른쪽 끝, 팬은 왼쪽)
 PLAN.photoGuest={ tall:[...PLAN.photo.tall.slice(0,3), {img:'pgan',side:'R',scale:1.9,down:.06,anchor:'top'}] };
+// 심의미필 버전 — 같은 배치, 눈에 모자이크를 미리 구워 둔 사진(m*)으로
+PLAN.photoGuestM={ tall:PLAN.photoGuest.tall.map(p=>p&&{...p, img:'m'+p.img.slice(1)}) };
 
 const ready=im=>im&&im.complete&&im.naturalWidth>0;
 let _tone=null;
@@ -97,7 +99,8 @@ export default {
   images: { frame:'assets/frame.jpg',
             cha:'assets/cha.png',   kim:'assets/kim.png',   pd:'assets/pd.png',      // 일러스트
             pcha:'assets/pcha.webp', pkim:'assets/pkim.webp', ppd:'assets/ppd.webp', pgan:'assets/pgan.webp', // 실사 누끼
-            stamp:'assets/stamp.png' },                                                 // 도장 로고(종이 프레임용)
+            mcha:'assets/mcha.webp', mkim:'assets/mkim.webp', mpd:'assets/mpd.webp',  mgan:'assets/mgan.webp', // 같은 사진, 눈 모자이크
+            stamp:'assets/stamp.png', stamp2:'assets/stamp2.png' },                      // 심의필 / 심의미필 도장
   filters: [
     {id:'original', name:'오리지널', css:'none'},
     {id:'tone',     name:'스크린톤', css:'grayscale(1) contrast(1.18)'},
@@ -107,7 +110,8 @@ export default {
     {id:'tall-i', name:'일러스트<br>세로 버-전',              layout:'tall', cast:'illust',     bg:'#0a0a0a', txt:RED},
     {id:'tall-p', name:'심의필<br>버-전',                     layout:'tall', cast:'photo',      paper:true, bg:'#f7f6f2', txt:RED}, // paper: 꽃 대신 흰 종이 + 도장
     {id:'tall-g', name:'심의필<br><small>스페-샬 게스트</small>',   layout:'tall', cast:'photoGuest', paper:true, bg:'#f7f6f2', txt:RED}, // 4컷에 김간지
-    {id:'tall-g2',name:'심의미필<br><small>스페-샬 게스트</small>', layout:'tall', cast:'photoGuest', paper:true, bg:'#f7f6f2', txt:RED}, // TODO: 4번과 무엇이 다른지 확인 필요 — 지금은 동일
+    {id:'tall-g2',name:'심의미필<br><small>스페-샬 게스트</small>', layout:'tall', cast:'photoGuestM', paper:true, bg:'#f7f6f2', txt:RED,
+     stamp:{key:'stamp2', w:860, cx:600}}, // 눈 모자이크 + 심의미필 도장(가로가 길어 폭·중심을 따로 준다)
   ],
 
   // 스트립 전체를 그린다 — 캔버스 크기·배경·컷·출연자·테두리
@@ -125,7 +129,7 @@ export default {
       if(g.frame.paper) printOn(x,L.W,L.H,r);
       border(x,...r);
     });
-    if(g.frame.paper && ready(g.img.stamp)) seal(x,g.img.stamp,L.stamp); // 4컷 아래를 물고 찍힌 도장
+    if(g.frame.paper){ const st={...L.stamp, ...(g.frame.stamp||{})}, im=g.img[st.key||'stamp']; if(ready(im)) seal(x,im,st); } // 4컷 아래를 물고 찍힌 도장 (프레임별로 다른 도장 가능)
   },
 
   // 라이브뷰 가이드 — 이 컷에 실제로 담기는 띠만 밝게, 출연자를 반투명으로 제자리에
