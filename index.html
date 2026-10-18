@@ -35,7 +35,6 @@
     background:#000; border:1px solid var(--line)}
   video{width:100%; height:100%; object-fit:cover; transform:scaleX(-1)}
   .guide{position:absolute; inset:0; width:100%; height:100%; pointer-events:none} /* 테마가 그리는 촬영 가이드(출연자 자리·잘리는 영역) */
-  .fx{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; display:none} /* 픽셀 처리 필터(filters[].process)의 라이브뷰 — 영상 위에 덮는다 */
   .count{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
     font-size:140px; font-weight:700; color:#fff; text-shadow:0 4px 40px rgba(0,0,0,.7);
     background:rgba(0,0,0,.2); pointer-events:none}
@@ -118,7 +117,6 @@
   <div class="panel">
     <div class="stage">
       <video id="cam" autoplay playsinline muted></video>
-      <canvas class="fx" id="fx"></canvas>
       <canvas class="guide" id="guide"></canvas>
       <div class="flash" id="flash"></div>
       <div class="progress" id="prog"></div>
@@ -176,7 +174,6 @@ const SHOTS=4, PW=400, PH=267, PAD=24, GAP=14, FOOT=82, DPR=3;
 // ── 테마 로드 ──────────────────────────────────────────────────────
 // ?theme=<폴더명> → themes/<폴더명>/theme.js. 없거나 못 읽으면 base로 떨어진다.
 // 테마 계약: {name, slug, frames:[{id,name,sub?,color?,bg,txt}], defaultFrame?, phrases:[], css?, preview?:'side', labels?:{filters,frames,phrases,preview}}
-// 필터: {id, name, css, process?(canvas)} — process가 있으면 CSS 필터 대신 캔버스 픽셀을 직접 바꾼다(라이브뷰·컷 둘 다)
 const THEME_ID=new URLSearchParams(location.search).get('theme')||'base';
 const asset=p=>`themes/${THEME_ID}/${p}`; // 테마 폴더 기준으로 경로 해석
 let T, themeErr=false;
@@ -215,7 +212,7 @@ function chips(host, list, render, onPick, sel=0){
   });
 }
 const label=t=>t.sub?`${t.name}<small>${t.sub}</small>`:t.name; // sub가 있으면 둘째 줄에 작게
-chips($('filters'), FX, label, t=>{filter=t; video.style.filter=t.css; document.body.dataset.filter=t.id; updatePreview(); startFx();});
+chips($('filters'), FX, label, t=>{filter=t; video.style.filter=t.css; document.body.dataset.filter=t.id; updatePreview();});
 document.body.dataset.filter=filter.id; // 테마 CSS가 필터별로 라이브뷰 위에 효과를 얹을 수 있게
 // 프레임이 하나뿐인 테마는 FRAME 칸도 숨긴다(고를 게 없는 칩 한 개를 안 보이게)
 if(T.frames.length>1) chips($('frames'), T.frames, label, t=>{frame=t; updatePreview(); drawGuide(0);}, T.frames.indexOf(frame));
@@ -227,7 +224,7 @@ else{ const r=$('phrases'); r.previousElementSibling.remove(); r.remove(); }
 (async()=>{
   try{
     const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:1920},height:{ideal:1080}},audio:false});
-    video.srcObject=stream; video.onloadedmetadata=()=>{ drawGuide(0); startFx(); };
+    video.srcObject=stream; video.onloadedmetadata=()=>drawGuide(0);
   }catch(e){
     $('err').style.display='block'; $('err').innerHTML='카메라 권한이 필요해요.<br>iPad 설정 > Safari > 카메라에서 허용해 주세요.';
     $('shoot').disabled=true;
@@ -252,26 +249,18 @@ function drawCover(ctx,dw,dh){
   ctx.filter=filter.css==='none'?'none':filter.css;
   ctx.drawImage(video, sx,sy,sw,sh, 0,0,dw,dh); ctx.restore();
 }
-function snap(scale=1){
-  const lr=(filter.lo||1)*scale; // 보통은 풀해상도, 하두리만 저해상도로 떠서 복고 느낌. scale은 미리보기용 축소
+function snap(){
+  const lr=filter.lo||1; // 보통은 풀해상도, 하두리만 저해상도로 떠서 복고 느낌
   const cw=Math.round(PW*DPR*lr), ch=Math.round(PH*DPR*lr);
   const c=document.createElement('canvas'); c.width=cw; c.height=ch;
-  drawCover(c.getContext('2d'), cw, ch);
-  if(filter.process) filter.process(c); // 픽셀 처리 필터
-  return c;
+  drawCover(c.getContext('2d'), cw, ch); return c;
 }
-// 픽셀 처리 필터의 라이브뷰 — 영상을 작은 캔버스에 떠서 처리해 영상 위에 덮는다(초당 ~15장). 필터를 바꾸면 스스로 멈춘다
-const fx=$('fx'); let fxOn=false;
-function startFx(){ if(fxOn) return; fxOn=true; (function loop(){
-  if(!filter.process || !$('capScreen').classList.contains('on')){ fx.style.display='none'; fxOn=false; return; }
-  if(video.videoWidth){ const w=480, h=320; if(fx.width!==w){ fx.width=w; fx.height=h; } drawCover(fx.getContext('2d'), w, h); filter.process(fx); fx.style.display='block'; }
-  setTimeout(loop, 66); })(); }
 
 let busy=false;
 function updatePreview(){
   if(busy) return;
   if(!video.videoWidth){ compose($('preview'), []); return; } // 카메라가 뜨기 전(또는 거부)엔 빈 컷으로 프레임만 보여준다
-  const s=snap(filter.process?0.5:1); // 픽셀 처리 필터는 미리보기를 절반 해상도로(어차피 작게 보임)
+  const s=snap();
   compose($('preview'), Array(SHOTS).fill(s));
 }
 
@@ -341,7 +330,7 @@ function compose(cv=$('strip'), list=shots){
 function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id===id)); window.scrollTo(0,0); }
 
 $('shoot').onclick=shoot;
-$('retake').onclick=()=>{ show('capScreen'); startFx(); };
+$('retake').onclick=()=>show('capScreen');
 setInterval(()=>{ if($('capScreen').classList.contains('on')) updatePreview(); }, 450);
 // 테마 웹폰트가 늦게 뜨면 캔버스가 대체 폰트로 그려지므로, 로드 후 한 번 다시 그린다
 if(document.fonts) document.fonts.ready.then(()=>{ if($('capScreen').classList.contains('on')) updatePreview(); });

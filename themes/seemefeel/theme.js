@@ -40,37 +40,6 @@ PLAN.photoGuestM={ tall:[...PLAN.photoGuest.tall.slice(0,3).map(p=>({...p, img:'
    censor:[[-25,172,120,120,18],[272,200,120,120,18]]}] }; // 양손 — 손가락·주먹 주변까지 정사각형(그림 px 기준, 마지막은 블록 크기). 합성 때 뒤의 사진째 굵게 모자이크해 손짓이 안 읽히게
 
 const ready=im=>im&&im.complete&&im.naturalWidth>0;
-
-// ── 만화톤: 선화(XDoG) + 스크린톤. 캔버스를 제자리에서 흑백 만화로 바꾼다. 라이브뷰(480px)·컷(1200px)·출연자 사진 공용 ──
-function boxBlur(src,W,H,r){ // 밝기 배열을 가로·세로 박스 블러 3번 = 가우시안 근사(ctx.filter 없이 — 구형 사파리도 됨)
-  let a=src, b=new Float32Array(W*H);
-  for(let pass=0;pass<3;pass++){
-    for(let y=0;y<H;y++){ const o=y*W; let s=0; for(let x=-r;x<=r;x++) s+=a[o+Math.min(W-1,Math.max(0,x))];
-      for(let x=0;x<W;x++){ b[o+x]=s/(2*r+1); s+=a[o+Math.min(W-1,x+r+1)]-a[o+Math.max(0,x-r)]; } }
-    for(let x=0;x<W;x++){ let s=0; for(let y=-r;y<=r;y++) s+=b[Math.min(H-1,Math.max(0,y))*W+x];
-      for(let y=0;y<H;y++){ a[y*W+x]=s/(2*r+1); s+=b[Math.min(H-1,y+r+1)*W+x]-b[Math.max(0,y-r)*W+x]; } }
-    a=a; }
-  return a;
-}
-function manga(c){
-  const W=c.width, H=c.height, k=W/600, x=c.getContext('2d'), img=x.getImageData(0,0,W,H), d=img.data, n=W*H;
-  const L=new Float32Array(n); for(let i=0;i<n;i++) L[i]=d[i*4]*.299+d[i*4+1]*.587+d[i*4+2]*.114;
-  const g1=boxBlur(Float32Array.from(L),W,H,Math.max(1,Math.round(1.1*k))), g2=boxBlur(Float32Array.from(L),W,H,Math.max(2,Math.round(1.9*k)));
-  const th=3.5, soft=.35, P=Math.max(4,Math.round(6*k)), c0=(P-1)/2, R=P*.53;
-  for(let i=0;i<n;i++){
-    const e=g1[i]-g2[i]; let v = e>=-th ? 1 : Math.max(0, 1+Math.tanh(soft*(e+th))); // 가는 블러 − 굵은 블러가 음수인 곳 = 먹선
-    const px=i%W, py=(i/W)|0, cx=(px%P)-c0, cy=(py%P)-c0, rad=R*Math.pow(Math.max(0,(1-L[i]/255)-.12),.9); // 어두울수록 큰 망점
-    if(cx*cx+cy*cy<rad*rad) v=Math.min(v,.1);
-    d[i*4]=d[i*4+1]=d[i*4+2]=v*255; }
-  x.putImageData(img,0,0);
-}
-const _mangaHost={};
-function mangaHost(im,key){ // 출연자 누끼도 같은 만화톤으로 — 흰 바탕에 놓고 처리한 뒤 원래 알파로 오려 둔다(한 번만)
-  if(!_mangaHost[key]){ const c=document.createElement('canvas'); c.width=im.naturalWidth; c.height=im.naturalHeight; const q=c.getContext('2d');
-    q.fillStyle='#fff'; q.fillRect(0,0,c.width,c.height); q.drawImage(im,0,0); manga(c);
-    q.globalCompositeOperation='destination-in'; q.drawImage(im,0,0); _mangaHost[key]=c; }
-  return _mangaHost[key];
-}
 let _tone=null;
 function tone(x){ // 망점 — 6px 타일 한 번 만들어 재사용
   if(_tone) return _tone;
@@ -95,13 +64,12 @@ function cover(x,img,dx,dy,dw,dh){ // 비율 유지하고 가운데를 채운다
   const s=Math.max(dw/img.width,dh/img.height), cw=dw/s, ch=dh/s;
   x.drawImage(img,(img.width-cw)/2,(img.height-ch)/2,cw,ch,dx,dy,dw,dh);
 }
-function host(x,im,dx,dy,dw,dh,{side,scale,down=0,anchor='bottom',shift=0}){ // 컷 밖은 잘린다(의도). im은 이미지나 캔버스
-  const iw=im.naturalWidth||im.width, ih=im.naturalHeight||im.height;
-  const h=dh*scale, w=h*iw/ih, inset=dw*0.03;
+function host(x,im,dx,dy,dw,dh,{side,scale,down=0,anchor='bottom',shift=0}){ // 컷 밖은 잘린다(의도)
+  const h=dh*scale, w=h*im.naturalWidth/im.naturalHeight, inset=dw*0.03;
   const px = (side==='L'? dx+inset : side==='R'? dx+dw-w-inset : dx+(dw-w)/2) + dw*shift; // shift: 컷 폭 대비 좌우 이동(+오른쪽)
   const py = anchor==='top' ? dy+dh*down : dy+dh-h+dh*down;
   x.save(); x.beginPath(); x.rect(dx,dy,dw,dh); x.clip(); x.drawImage(im,px,py,w,h); x.restore();
-  return {px,py,s:h/ih}; // 그림 px → 캔버스 px 변환용
+  return {px,py,s:h/im.naturalHeight}; // 그림 px → 캔버스 px 변환용
 }
 function pixelate(x,cv,[rx,ry,rw,rh],B){ // 캔버스의 그 영역을 B px 블록 모자이크로(TV 모자이크 — 사람·배경 사진 가리지 않고 전부)
   const bw=Math.max(1,Math.round(rw/B)), bh=Math.max(1,Math.round(rh/B)), c=document.createElement('canvas'); c.width=bw; c.height=bh;
@@ -139,7 +107,6 @@ export default {
   filters: [
     {id:'original', name:'오리지널', css:'none'},
     {id:'tone',     name:'스크린톤', css:'grayscale(1) contrast(1.18)'},
-    {id:'manga',    name:'만화톤',   css:'none', process:manga}, // 선화 + 스크린톤 — 캔버스 픽셀 처리(라이브뷰·컷·출연자 사진 모두)
   ],
   frames: [ // layout: 캔버스·컷 배치 / cast: 어떤 출연자 그림을 세울지. 칩은 name(계열) 아래 sub(버전)를 작게 한 줄로. color는 계열 색
     {id:'wide-i', name:'일러스트', sub:'와이드 버-전',        layout:'wide', cast:'illust',     bg:'#0a0a0a', txt:RED},
@@ -162,8 +129,7 @@ export default {
       if(s) cover(x,s,...r); else { x.fillStyle='#bdbdbd'; x.fillRect(...r); }
       if(g.filter.id==='tone'){ x.fillStyle=tone(x); x.fillRect(...r); }
       const p=plan[i];
-      if(p && ready(g.img[p.img])){ const im0=g.img[p.img], im=(g.filter.process && g.frame.cast!=='illust') ? mangaHost(im0,p.img) : im0; // 만화톤이면 실사 출연자도 만화로
-        const o=host(x,im,...r,p);
+      if(p && ready(g.img[p.img])){ const o=host(x,g.img[p.img],...r,p);
         (p.censor||[]).forEach(([cx0,cy0,cw0,ch0,B=9])=>{ const q=clipRect([o.px+cx0*o.s,o.py+cy0*o.s,cw0*o.s,ch0*o.s],r); if(q) pixelate(x,cv,q,B*o.s); }); } // B=9면 구워 둔 눈 모자이크와 같은 블록
       if(g.frame.cutLine!==false) border(x,...r); // cutLine:false — 컷마다 두르는 검정 선을 뺀다(종이에 인화된 사진처럼)
     });

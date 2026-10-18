@@ -28,7 +28,6 @@ open http://localhost:8787/?theme=<이름>
 | `name` | O | `<title>`과 화면 헤더 |
 | `slug` | | 저장 파일명 접두사 (기본 `photobooth`) |
 | `frames` | O | `{id, name, sub?, color?, bg, txt}` 배열. 스트립 배경색과 글자색. `sub`는 칩 둘째 줄(작게), `color`는 칩 색 |
-| `filters` | X | `{id, name, css, process?}` 배열. 없으면 엔진 기본 3종. `process(canvas)`를 주면 CSS 대신 픽셀을 직접 바꾼다(라이브뷰·컷 모두, 예: 만화톤) |
 | `preview` | X | `'side'`면 미리보기를 오른쪽 열에 세운다(세로 아이패드 한 화면). 없으면 패널 안 아래 |
 | `labels` | X | `{filters, frames, phrases, preview}` 칸 이름을 바꾼다(예: 필터→화면 효과) |
 | `phrases` | O | 문구 칩. 첫 항목이 기본값, `''`는 문구 없음 |
