@@ -64,15 +64,24 @@
   #preview{height:300px; max-width:100%; border:1px solid var(--line); background:var(--accent)}
 
   /* 미리보기 옆 배치(테마 preview:'side') — 왼쪽 열에 패널+START, 오른쪽 열에 미리보기. 세로 아이패드 한 화면에 다 들어가 스크롤이 없다 */
-  body[data-preview="side"] .capmain{display:grid; grid-template-columns:minmax(0,1fr) 300px; grid-template-rows:auto 1fr auto;
-    grid-template-areas:"head head" "panel pv" "btn pv"; column-gap:20px; max-width:none; width:100%; align-items:start}
+  body[data-preview="side"] .capmain{display:grid; grid-template-columns:minmax(0,1fr) 300px; column-gap:20px; max-width:none; width:100%; align-items:start}
   body[data-preview="side"] .capmain>header{grid-area:head}
+  body[data-preview="side"] #capScreen .capmain{grid-template-rows:auto 1fr auto; grid-template-areas:"head head" "panel pv" "btn pv"}
   body[data-preview="side"] .capmain>.panel:not(#pv){grid-area:panel; max-width:none} /* 열 폭을 꽉 채워 START와 같은 폭 */
   body[data-preview="side"] #shoot{grid-area:btn; align-self:end; max-width:none}
   body[data-preview="side"] #pv{grid-area:pv}
   body[data-preview="side"] #pv .lab{margin-top:0}
   body[data-preview="side"] #preview{width:100%; height:auto}
-  @media(max-width:600px){ body[data-preview="side"] .capmain{grid-template-columns:minmax(0,1fr); grid-template-areas:"head" "panel" "pv" "btn"; row-gap:18px} }
+  /* 결과 화면 — 왼쪽 스트립, 오른쪽 열에 QR·SAVE·다시 찍기(전부 열 폭 = 같은 크기) */
+  body[data-preview="side"] #resScreen .capmain{grid-template-areas:"head head" "strip side"}
+  body[data-preview="side"] .result-body{grid-area:strip; padding:0; align-items:flex-start}
+  body[data-preview="side"] #strip{max-height:calc(100vh - 290px)}
+  body[data-preview="side"] #side{grid-area:side; max-width:none}
+  body[data-preview="side"] #qrbox{width:100%; max-width:none; min-height:120px; justify-content:center}
+  body[data-preview="side"] #qrimg svg{width:100%; max-width:260px}
+  @media(max-width:600px){ body[data-preview="side"] .capmain{grid-template-columns:minmax(0,1fr); row-gap:18px}
+    body[data-preview="side"] #capScreen .capmain{grid-template-areas:"head" "panel" "pv" "btn"}
+    body[data-preview="side"] #resScreen .capmain{grid-template-areas:"head" "strip" "side"} }
 
   /* 좌 브랜드 컬럼 + 우 콘텐츠. 테마가 brand를 안 주면 컬럼은 사라진다 */
   .capwrap{display:flex; gap:32px; align-items:flex-start; justify-content:center; width:100%; max-width:900px; margin:0 auto}
@@ -88,6 +97,7 @@
   .result-body{flex:1; display:flex; align-items:center; justify-content:center; padding:4px 0; width:100%}
   #strip{max-width:100%; max-height:60vh; border:1px solid var(--line)}
 
+  .side{width:100%; max-width:560px; display:flex; flex-direction:column; align-items:center} /* QR + SAVE + 다시 찍기 묶음 */
   .qrbox{display:flex; flex-direction:column; align-items:center; gap:8px; min-height:26px}
   #qrimg{display:none}
   #qrimg svg{width:170px; height:auto; display:block}
@@ -136,11 +146,13 @@
   <div class="capwrap">
     <aside class="brand"></aside>
     <div class="capmain">
-  <header><div class="mark">PHOTO BOOTH</div><div class="tag">QR을 찍어 가져가거나 아래로 저장하세요</div></header>
+  <header><div class="mark">PHOTO BOOTH</div><div class="tag">QR을 찍어 가져가거나 SAVE로 저장하세요</div></header>
   <div class="result-body"><canvas id="strip"></canvas></div>
-  <div class="qrbox" id="qrbox"><div id="qrimg"></div><div class="qrcap" id="qrcap"></div></div>
-  <button class="btn btn-go full" id="download">SAVE · PNG 저장</button>
-  <button class="btn btn-ghost" id="retake">다시 찍기</button>
+  <div class="side" id="side">
+    <div class="qrbox" id="qrbox"><div id="qrimg"></div><div class="qrcap" id="qrcap"></div></div>
+    <button class="btn btn-go full" id="download">SAVE · PNG 저장</button>
+    <button class="btn btn-ghost" id="retake">다시 찍기</button>
+  </div>
     </div>
   </div>
 </section>
@@ -177,7 +189,7 @@ if(T.brand?.length) document.querySelectorAll('.brand').forEach(el=>
   el.innerHTML=T.brand.map(p=>`<img src="${asset(p)}" alt="">`).join(''));
 if(themeErr) document.querySelector('#capScreen .tag').textContent=`'${THEME_ID}' 테마를 못 찾아 기본 테마로 엽니다`;
 // 테마가 preview:'side'면 미리보기를 패널 밖으로 꺼내 오른쪽 열에 세운다(CSS는 위 data-preview 규칙)
-if(T.preview==='side'){ const pv=document.getElementById('pv'); pv.classList.add('panel'); pv.closest('.capmain').append(pv); document.body.dataset.preview='side'; }
+if(T.preview==='side'){ const pv=document.getElementById('pv'); pv.classList.add('panel'); pv.closest('.capmain').append(pv); document.getElementById('qrbox').classList.add('panel'); document.body.dataset.preview='side'; } // 결과 화면의 QR도 패널로
 
 const FX=T.filters||FILTERS;   // 테마가 자기 필터를 주면 그걸 쓴다(기본 목록은 건드리지 않는다)
 let filter=FX[0], frame=T.frames.find(f=>f.id===T.defaultFrame)||T.frames[0], phrase=T.phrases?.[0]||'', shots=[]; // defaultFrame: 처음 골라져 있을 프레임 id

@@ -125,8 +125,8 @@ export default {
   frames: [ // layout: 캔버스·컷 배치 / cast: 어떤 출연자 그림을 세울지. 칩은 name(계열) 아래 sub(버전)를 작게 한 줄로. color는 계열 색
     {id:'wide-i', name:'일러스트', sub:'와이드 버-전',        layout:'wide', cast:'illust',     bg:'#0a0a0a', txt:RED},
     {id:'tall-i', name:'일러스트', sub:'세로 버-전',          layout:'tall', cast:'illust',     bg:'#0a0a0a', txt:RED},
-    {id:'tall-p', name:'심의필',   sub:'오리지날-버-전',      layout:'tall', cast:'photo',      paper:true, cutLine:false, edge:12, bg:'#f7f6f2', txt:RED, color:RED}, // paper: 꽃 대신 흰 종이 + 도장. 컷 선 없이 종이 바깥만 검정 12px
-    {id:'tall-g', name:'심의필',   sub:'스페-샬 게스트 버-전', layout:'tall', cast:'photoGuest', paper:true, cutLine:false, edge:12, bg:'#f7f6f2', txt:RED, color:'#787878'}, // 4컷에 김간지. 게스트 버전 둘은 칩이 회색
+    {id:'tall-p', name:'심의필',   sub:'오리지날-버-전',      layout:'tall', cast:'photo',      paper:true, cutLine:false, bg:'#f7f6f2', txt:RED, color:RED}, // paper: 꽃 대신 흰 종이 + 도장. 컷 선 없이 사진만(2번 안)
+    {id:'tall-g', name:'심의필',   sub:'스페-샬 게스트 버-전', layout:'tall', cast:'photoGuest', paper:true, cutLine:false, bg:'#f7f6f2', txt:RED, color:'#787878'}, // 4컷에 김간지. 게스트 버전 둘은 칩이 회색
     {id:'tall-g2',name:'심의미필', sub:'스페-샬 게스트 버-전', layout:'tall', cast:'photoGuestM', paper:true, paperColor:'#141414', bg:'#141414', txt:'#d7000f', color:'#787878',
      stamp:{key:'stamp2w', w:860, cx:600, blend:'source-over', color:'#d7000f'}}, // 검정 종이 + 눈 모자이크 + 빨간 심의미필 도장(흰 도장을 도장 원본 빨강으로 물들임 — 속빈 곳은 검정 종이가 비침). 칩은 회색
   ],
