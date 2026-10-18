@@ -26,10 +26,11 @@ const PLAN={
           {img:'kim',side:'C',scale:0.95,down:.14},
           {img:'pd', side:'L',scale:0.94,down:.12}, null],
   },
-  photo:{  // 전신 실사 — 일러스트처럼 상반신만 보이게 키우고, 하트 손이 가운데 오게. 팬은 오른쪽 (세로만 씀)
+  photo:{  // 전신 실사 — 일러스트처럼 상반신만 보이게 키우고, 하트 손이 가운데 오게. 1~3컷 팬은 오른쪽, 4컷(김간지)은 왼쪽 (세로만 씀)
     tall:[{img:'pcha',side:'L',scale:1.9,down:.06,anchor:'top',shift:-.02},  // 하트 손이 컷 가운데 오게 왼쪽으로 — 몸 왼쪽은 잘림
           {img:'pkim',side:'L',scale:1.9,down:.06,anchor:'top',shift:+.08},  // 손(하트)이 컷 가운데
-          {img:'ppd', side:'L',scale:1.9,down:.10,anchor:'top',shift:0}, null], // 왼쪽 절반을 차지 — 하트의 왼쪽 반, 팬이 오른쪽 반
+          {img:'ppd', side:'L',scale:1.9,down:.10,anchor:'top',shift:0},        // 왼쪽 절반을 차지 — 하트의 왼쪽 반, 팬이 오른쪽 반
+          {img:'pgan',side:'R',scale:1.9,down:.06,anchor:'top'}],                // 김간지: 오른쪽 끝, 팬은 왼쪽
   },
 };
 
@@ -94,7 +95,7 @@ export default {
   css: 'theme.css',
   images: { frame:'assets/frame.jpg',
             cha:'assets/cha.png',   kim:'assets/kim.png',   pd:'assets/pd.png',      // 일러스트
-            pcha:'assets/pcha.webp', pkim:'assets/pkim.webp', ppd:'assets/ppd.webp',   // 실사 누끼
+            pcha:'assets/pcha.webp', pkim:'assets/pkim.webp', ppd:'assets/ppd.webp', pgan:'assets/pgan.webp', // 실사 누끼
             stamp:'assets/stamp.png' },                                                 // 도장 로고(종이 프레임용)
   filters: [
     {id:'original', name:'오리지널', css:'none'},
