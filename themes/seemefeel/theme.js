@@ -21,13 +21,13 @@ const PLAN={
           {img:'kim',side:'C',scale:0.95,down:.14},
           {img:'pd', side:'L',scale:0.94,down:.12}, null],
   },
-  photo:{  // 전신 실사 — 위를 기준으로 세우고 아래(다리)는 컷 밖으로. 사람 키 느낌이 나는 배율
-    wide:[{img:'pcha',side:'R',scale:3.2,down:-.02,anchor:'top'},   // 차승우: 왼쪽으로 기울여 손짓 → 오른쪽에
-          {img:'pkim',side:'L',scale:3.2,down:-.02,anchor:'top'},   // 김윤주: 오른쪽으로 손짓 → 왼쪽에
-          {img:'ppd', side:'R',scale:3.2,down:-.35,anchor:'top'}, null], // 김은하: 팔을 왼쪽 위로 → 오른쪽에, 팔은 컷 위로
-    tall:[{img:'pcha',side:'R',scale:1.7,down:0,anchor:'top'},
-          {img:'pkim',side:'L',scale:1.7,down:0,anchor:'top'},
-          {img:'ppd', side:'R',scale:1.7,down:-.12,anchor:'top'}, null],
+  photo:{  // 전신 실사 — 위를 기준으로 세우고 아래(다리)는 컷 밖으로. 셋 다 가장자리에서 가운데 쪽으로 당겨 세운다
+    wide:[{img:'pcha',side:'R',scale:3.0,down:-.02,anchor:'top',shift:-.10},  // 차승우: 왼쪽으로 기울여 손짓 → 오른쪽에
+          {img:'pkim',side:'L',scale:3.0,down:-.02,anchor:'top',shift:+.16},  // 김윤주: 반쪽 하트가 컷 가운데 오게
+          {img:'ppd', side:'R',scale:3.0,down:-.35,anchor:'top',shift:-.10}, null], // 김은하: 팔은 컷 위로
+    tall:[{img:'pcha',side:'R',scale:1.45,down:.05,anchor:'top',shift:-.10},  // 머리 위 여백 5%, 허벅지 위까지 보임
+          {img:'pkim',side:'L',scale:1.45,down:.05,anchor:'top',shift:+.16},  // 손(하트)이 컷 가운데
+          {img:'ppd', side:'R',scale:1.45,down:-.11,anchor:'top',shift:-.10}, null], // 머리 높이를 둘과 맞춤
   },
 };
 
@@ -44,9 +44,9 @@ function cover(x,img,dx,dy,dw,dh){ // 비율 유지하고 가운데를 채운다
   const s=Math.max(dw/img.width,dh/img.height), cw=dw/s, ch=dh/s;
   x.drawImage(img,(img.width-cw)/2,(img.height-ch)/2,cw,ch,dx,dy,dw,dh);
 }
-function host(x,im,dx,dy,dw,dh,{side,scale,down=0,anchor='bottom'}){ // 컷 밖은 잘린다(의도)
+function host(x,im,dx,dy,dw,dh,{side,scale,down=0,anchor='bottom',shift=0}){ // 컷 밖은 잘린다(의도)
   const h=dh*scale, w=h*im.naturalWidth/im.naturalHeight, inset=dw*0.03;
-  const px = side==='L'? dx+inset : side==='R'? dx+dw-w-inset : dx+(dw-w)/2;
+  const px = (side==='L'? dx+inset : side==='R'? dx+dw-w-inset : dx+(dw-w)/2) + dw*shift; // shift: 컷 폭 대비 좌우 이동(+오른쪽)
   const py = anchor==='top' ? dy+dh*down : dy+dh-h+dh*down;
   x.save(); x.beginPath(); x.rect(dx,dy,dw,dh); x.clip(); x.drawImage(im,px,py,w,h); x.restore();
 }
