@@ -65,4 +65,5 @@ body[data-filter="tone"] .guide{
    아랫줄 글씨는 칩 폭에 맞춰 줄어든다(최대 11px, 아래 제한 없음) — 어떤 폭에서도 꺾이지 않게 */
 #frames{ container-type:inline-size }
 #frames .chip{ flex:1 1 45% }
+#frames .chip[data-id="tall-p"]{ flex-basis:100% } /* 심의필 오리지날은 한 줄을 혼자 길게 — 위엔 일러스트 둘, 아래엔 게스트 둘 */
 #frames .chip small{ font-size:min(11px, 2.3cqw); margin-top:5px; letter-spacing:-0.04em; white-space:nowrap; overflow:hidden }

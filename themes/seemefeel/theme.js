@@ -112,6 +112,7 @@ export default {
   slug: 'seemefeel',
   css: 'theme.css',
   preview: 'side', // 세로 아이패드 한 화면: 왼쪽 라이브뷰·칩·START, 오른쪽 미리보기 (스크롤 없음)
+  defaultFrame: 'tall-p', // 처음엔 심의필 오리지날이 골라져(빨강) 있다
   images: { frame:'assets/frame.jpg',
             cha:'assets/cha.png',   kim:'assets/kim.png',   pd:'assets/pd.png',      // 일러스트
             pcha:'assets/pcha.webp', pkim:'assets/pkim.webp', ppd:'assets/ppd.webp', pgan:'assets/pgan-heart.webp', // 실사 누끼 (김간지는 손가락 하트 포즈 — 심의필 게스트용. 파일명을 바꿔 옛 포즈 캐시를 피함)
@@ -125,7 +126,7 @@ export default {
     {id:'wide-i', name:'일러스트', sub:'와이드 버-전',        layout:'wide', cast:'illust',     bg:'#0a0a0a', txt:RED},
     {id:'tall-i', name:'일러스트', sub:'세로 버-전',          layout:'tall', cast:'illust',     bg:'#0a0a0a', txt:RED},
     {id:'tall-p', name:'심의필',   sub:'오리지날-버-전',      layout:'tall', cast:'photo',      paper:true, bg:'#f7f6f2', txt:RED, color:RED}, // paper: 꽃 대신 흰 종이 + 도장
-    {id:'tall-g', name:'심의필',   sub:'스페-샬 게스트 버-전', layout:'tall', cast:'photoGuest', paper:true, bg:'#f7f6f2', txt:RED, color:RED}, // 4컷에 김간지
+    {id:'tall-g', name:'심의필',   sub:'스페-샬 게스트 버-전', layout:'tall', cast:'photoGuest', paper:true, bg:'#f7f6f2', txt:RED, color:'#787878'}, // 4컷에 김간지. 게스트 버전 둘은 칩이 회색
     {id:'tall-g2',name:'심의미필', sub:'스페-샬 게스트 버-전', layout:'tall', cast:'photoGuestM', paper:true, paperColor:'#141414', bg:'#141414', txt:'#d7000f', color:'#787878',
      stamp:{key:'stamp2w', w:860, cx:600, blend:'source-over', color:'#d7000f'}}, // 검정 종이 + 눈 모자이크 + 빨간 심의미필 도장(흰 도장을 도장 원본 빨강으로 물들임 — 속빈 곳은 검정 종이가 비침). 칩은 회색
   ],

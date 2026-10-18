@@ -161,7 +161,7 @@ const SHOTS=4, PW=400, PH=267, PAD=24, GAP=14, FOOT=82, DPR=3;
 
 // ── 테마 로드 ──────────────────────────────────────────────────────
 // ?theme=<폴더명> → themes/<폴더명>/theme.js. 없거나 못 읽으면 base로 떨어진다.
-// 테마 계약: {name, slug, frames:[{id,name,sub?,color?,bg,txt}], phrases:[], css?, preview?:'side'}
+// 테마 계약: {name, slug, frames:[{id,name,sub?,color?,bg,txt}], defaultFrame?, phrases:[], css?, preview?:'side'}
 const THEME_ID=new URLSearchParams(location.search).get('theme')||'base';
 const asset=p=>`themes/${THEME_ID}/${p}`; // 테마 폴더 기준으로 경로 해석
 let T, themeErr=false;
@@ -180,15 +180,16 @@ if(themeErr) document.querySelector('#capScreen .tag').textContent=`'${THEME_ID}
 if(T.preview==='side'){ const pv=document.getElementById('pv'); pv.classList.add('panel'); pv.closest('.capmain').append(pv); document.body.dataset.preview='side'; }
 
 const FX=T.filters||FILTERS;   // 테마가 자기 필터를 주면 그걸 쓴다(기본 목록은 건드리지 않는다)
-let filter=FX[0], frame=T.frames[0], phrase=T.phrases?.[0]||'', shots=[];
+let filter=FX[0], frame=T.frames.find(f=>f.id===T.defaultFrame)||T.frames[0], phrase=T.phrases?.[0]||'', shots=[]; // defaultFrame: 처음 골라져 있을 프레임 id
 
 const $=id=>document.getElementById(id);
 const video=$('cam'), flash=$('flash'), count=$('count'), prog=$('prog');
 
-function chips(host, list, render, onPick){
+function chips(host, list, render, onPick, sel=0){
   list.forEach((t,i)=>{
     const b=document.createElement('button');
-    b.className='chip'; b.setAttribute('aria-pressed', i===0); b.innerHTML=render(t);
+    b.className='chip'; b.setAttribute('aria-pressed', i===sel); b.innerHTML=render(t);
+    if(t.id) b.dataset.id=t.id; // 테마 CSS가 특정 칩만 다르게 놓을 수 있게(예: 한 칸을 가로로 꽉 채움)
     if(t.color) b.style.setProperty('--chip', t.color); // 칩 색(테두리·글자, 고르면 채움) — 계열 구분용
     b.onclick=()=>{ onPick(t); [...host.children].forEach((c,j)=>c.setAttribute('aria-pressed', j===i)); };
     host.appendChild(b);
@@ -198,7 +199,7 @@ const label=t=>t.sub?`${t.name}<small>${t.sub}</small>`:t.name; // sub가 있으
 chips($('filters'), FX, label, t=>{filter=t; video.style.filter=t.css; document.body.dataset.filter=t.id; updatePreview();});
 document.body.dataset.filter=filter.id; // 테마 CSS가 필터별로 라이브뷰 위에 효과를 얹을 수 있게
 // 프레임이 하나뿐인 테마는 FRAME 칸도 숨긴다(고를 게 없는 칩 한 개를 안 보이게)
-if(T.frames.length>1) chips($('frames'), T.frames, label, t=>{frame=t; updatePreview(); drawGuide(0);});
+if(T.frames.length>1) chips($('frames'), T.frames, label, t=>{frame=t; updatePreview(); drawGuide(0);}, T.frames.indexOf(frame));
 else{ const r=$('frames'); r.previousElementSibling.remove(); r.remove(); }
 // 문구를 안 쓰는 테마는 MESSAGE 칸을 통째로 없앤다(빈 칸이 남지 않게)
 if(T.phrases?.length) chips($('phrases'), T.phrases, t=>t||'없음', t=>{phrase=t; updatePreview();});

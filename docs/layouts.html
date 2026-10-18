@@ -108,7 +108,7 @@ body.big section{display:none} body.big section.show{display:flex}
   </div>
   <div class="pads">
     <div class="pad"><div class="frame">
-      <div class="ipad" data-def="3">
+      <div class="ipad" data-def="2">
         <div class="logo"></div>
         <div class="cols">
           <div class="col">
@@ -141,7 +141,7 @@ body.big section{display:none} body.big section.show{display:flex}
   </div>
   <div class="pads">
     <div class="pad"><div class="frame">
-      <div class="ipad scroll" data-def="3">
+      <div class="ipad scroll" data-def="2">
         <div class="pin top">
           <div class="logo sm"></div>
           <div class="stage" style="width:560px;margin:14px auto 0"><canvas class="guide"></canvas><div class="live">● LIVE</div></div>
@@ -172,7 +172,7 @@ body.big section{display:none} body.big section.show{display:flex}
   </div>
   <div class="pads">
     <div class="pad"><div class="frame">
-      <div class="ipad" data-def="3">
+      <div class="ipad" data-def="2">
         <div class="logo"></div>
         <div class="cols">
           <div class="panel big-chips" style="flex:1">
@@ -187,7 +187,7 @@ body.big section{display:none} body.big section.show{display:flex}
       </div>
     </div><div class="cap">C-1 고르기 화면</div></div>
     <div class="pad"><div class="frame">
-      <div class="ipad" data-def="3" style="padding-top:24px">
+      <div class="ipad" data-def="2" style="padding-top:24px">
         <div class="logo sm"></div>
         <div class="stage" style="margin-top:14px"><canvas class="guide"></canvas><div class="live">1 / 4</div><div class="count">3</div></div>
         <div class="slots"><div class="slot on">1</div><div class="slot">2</div><div class="slot">3</div><div class="slot">4</div></div>
@@ -218,6 +218,7 @@ function chips(host,list,onPick,sel=0){
   host.innerHTML='';
   list.forEach((t,i)=>{ const b=document.createElement('button'); b.className='chip'; b.setAttribute('aria-pressed',i===sel); b.innerHTML=label(t);
     if(t.color) b.style.setProperty('--chip',t.color);
+    if(t.id==='tall-p') b.style.flexBasis='100%'; // 오리지날은 한 줄 혼자
     b.onclick=()=>{ [...host.children].forEach((c,j)=>c.setAttribute('aria-pressed',j===i)); onPick(t); }; host.appendChild(b); });
 }
 const g=(frame,filter)=>({frame,filter,phrase:'',date:'',img:IMG,letterSpace:s=>s});
