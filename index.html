@@ -173,7 +173,7 @@ const SHOTS=4, PW=400, PH=267, PAD=24, GAP=14, FOOT=82, DPR=3;
 
 // ── 테마 로드 ──────────────────────────────────────────────────────
 // ?theme=<폴더명> → themes/<폴더명>/theme.js. 없거나 못 읽으면 base로 떨어진다.
-// 테마 계약: {name, slug, frames:[{id,name,sub?,color?,bg,txt}], defaultFrame?, phrases:[], css?, preview?:'side'}
+// 테마 계약: {name, slug, frames:[{id,name,sub?,color?,bg,txt}], defaultFrame?, phrases:[], css?, preview?:'side', labels?:{filters,frames,phrases,preview}}
 const THEME_ID=new URLSearchParams(location.search).get('theme')||'base';
 const asset=p=>`themes/${THEME_ID}/${p}`; // 테마 폴더 기준으로 경로 해석
 let T, themeErr=false;
@@ -190,6 +190,10 @@ if(T.brand?.length) document.querySelectorAll('.brand').forEach(el=>
 if(themeErr) document.querySelector('#capScreen .tag').textContent=`'${THEME_ID}' 테마를 못 찾아 기본 테마로 엽니다`;
 // 테마가 preview:'side'면 미리보기를 패널 밖으로 꺼내 오른쪽 열에 세운다(CSS는 위 data-preview 규칙)
 if(T.preview==='side'){ const pv=document.getElementById('pv'); pv.classList.add('panel'); pv.closest('.capmain').append(pv); document.getElementById('qrbox').classList.add('panel'); document.body.dataset.preview='side'; } // 결과 화면의 QR도 패널로
+
+// 칸 이름 바꾸기 — 테마가 labels:{filters,frames,phrases,preview}를 주면 그 글자로
+const LAB={filters:'#filters', frames:'#frames', phrases:'#phrases', preview:'#pv .preview-wrap'};
+for(const [k,txt] of Object.entries(T.labels||{})){ const el=document.querySelector(LAB[k]); if(el) el.previousElementSibling.textContent=txt; }
 
 const FX=T.filters||FILTERS;   // 테마가 자기 필터를 주면 그걸 쓴다(기본 목록은 건드리지 않는다)
 let filter=FX[0], frame=T.frames.find(f=>f.id===T.defaultFrame)||T.frames[0], phrase=T.phrases?.[0]||'', shots=[]; // defaultFrame: 처음 골라져 있을 프레임 id

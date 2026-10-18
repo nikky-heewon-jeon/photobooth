@@ -98,6 +98,7 @@ export default {
   css: 'theme.css',
   preview: 'side', // 세로 아이패드 한 화면: 왼쪽 라이브뷰·칩·START, 오른쪽 미리보기 (스크롤 없음)
   defaultFrame: 'tall-p', // 처음엔 심의필 오리지날이 골라져(빨강) 있다
+  labels: { filters:'화면 효과', frames:'뼈다귀 효과' }, // 칸 이름
   images: { frame:'assets/frame.jpg',
             cha:'assets/cha.png',   kim:'assets/kim.png',   pd:'assets/pd.png',      // 일러스트
             pcha:'assets/pcha.webp', pkim:'assets/pkim.webp', ppd:'assets/ppd.webp', pgan:'assets/pgan-heart.webp', // 실사 누끼 (김간지는 손가락 하트 포즈 — 심의필 게스트용. 파일명을 바꿔 옛 포즈 캐시를 피함)
