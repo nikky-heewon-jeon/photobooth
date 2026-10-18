@@ -46,11 +46,11 @@ const _paper={};
 function paperCanvas(W,H){ // 흰 종이 질감 — 알갱이 + 섬유결 + 옅은 얼룩. 누렇게는 안 한다. 크기별로 한 번만 그려 캐시
   const k=W+'x'+H; if(!_paper[k]){ const c=document.createElement('canvas'); c.width=W; c.height=H; const q=c.getContext('2d');
     let s=1234; const rnd=()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; };
-    q.fillStyle='#f6f5f1'; q.fillRect(0,0,W,H);
-    for(let i=0;i<7;i++){ const px=rnd()*W,py=rnd()*H,r=200+rnd()*320; const g=q.createRadialGradient(px,py,0,px,py,r); g.addColorStop(0,'rgba(70,60,45,.05)'); g.addColorStop(1,'rgba(70,60,45,0)'); q.fillStyle=g; q.fillRect(px-r,py-r,r*2,r*2); } // 톤 얼룩
-    q.strokeStyle='rgba(80,70,55,.11)'; q.lineWidth=1;
+    q.fillStyle='#fcfbf9'; q.fillRect(0,0,W,H); // 더 흰 종이
+    for(let i=0;i<7;i++){ const px=rnd()*W,py=rnd()*H,r=200+rnd()*320; const g=q.createRadialGradient(px,py,0,px,py,r); g.addColorStop(0,'rgba(60,60,60,.03)'); g.addColorStop(1,'rgba(60,60,60,0)'); q.fillStyle=g; q.fillRect(px-r,py-r,r*2,r*2); } // 톤 얼룩
+    q.strokeStyle='rgba(70,70,70,.10)'; q.lineWidth=1;
     for(let i=0;i<Math.round(W*H/1100);i++){ const px=rnd()*W,py=rnd()*H,a=rnd()*Math.PI,l=5+rnd()*16; q.beginPath(); q.moveTo(px,py); q.lineTo(px+Math.cos(a)*l,py+Math.sin(a)*l); q.stroke(); } // 섬유결
-    q.fillStyle='rgba(60,50,40,.10)'; for(let i=0;i<Math.round(W*H/300);i++) q.fillRect(rnd()*W,rnd()*H,1+rnd()*1.5,1+rnd()*1.5); // 알갱이
+    q.fillStyle='rgba(50,50,50,.09)'; for(let i=0;i<Math.round(W*H/300);i++) q.fillRect(rnd()*W,rnd()*H,1+rnd()*1.5,1+rnd()*1.5); // 알갱이
     _paper[k]=c; }
   return _paper[k];
 }
