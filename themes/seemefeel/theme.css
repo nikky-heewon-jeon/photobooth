@@ -10,6 +10,11 @@
   font-family:"BookkMyungjo"; font-weight:700; font-display:swap;
   src:url("assets/bookk-myungjo-bold.ttf") format("truetype");
 }
+/* 영문·숫자만 Mom's Typewriter(지은불사 때 쓴 타자기체). 한글 글리프가 없어서 한글은 자동으로 부크크 명조로 떨어진다 */
+@font-face{
+  font-family:"MomsTypewriter"; font-weight:100 900; font-display:swap;
+  src:url("assets/moms-typewriter.ttf") format("truetype");
+}
 
 :root{
   --bg:#f6f5f1;      /* 종이색 — 꽃무늬 이미지가 못 덮는 곳의 바탕 */
@@ -20,7 +25,7 @@
   --primary:#ca2b22; /* 로고 빨강 — 선택 칩·START */
   --dim:#7c756c;
 }
-body{ font-family:"BookkMyungjo", "Nanum Myeongjo", "Apple SD Gothic Neo", serif; font-weight:700; letter-spacing:-0.05em; } /* 굵게 · 자간 -50 */
+body{ font-family:"MomsTypewriter", "BookkMyungjo", "Nanum Myeongjo", "Apple SD Gothic Neo", serif; font-weight:700; letter-spacing:-0.05em; } /* 영문 타자기체 → 한글 부크크 명조. 굵게 · 자간 -50 */
 /* 꽃무늬 배경 — 화면에 고정, 스크롤해도 안 따라옴 */
 body::before{
   content:""; position:fixed; inset:0; z-index:-1;
