@@ -54,10 +54,11 @@ h1,h2{font-weight:700;letter-spacing:-0.02em}
 .ask p.warn b{display:block;color:var(--red);font-size:12px;letter-spacing:.04em;margin-bottom:2px}
 
 /* 프레임 5종 */
-.gallery{display:flex;gap:18px;align-items:flex-start;overflow-x:auto;padding-bottom:8px}
-.gallery figure{margin:0;flex:0 0 auto;text-align:center;font-size:12.5px;color:#333;line-height:1.4}
+.gallery{display:flex;gap:18px;align-items:flex-start}
+.gallery figure{margin:0;flex:1 1 0;min-width:0;text-align:center;font-size:12.5px;color:#333;line-height:1.4} /* flex-grow는 스크립트가 프레임 비율로 준다 → 높이가 같아진다 */
+@media(max-width:640px){.gallery{flex-wrap:wrap} .gallery figure{flex-basis:30%}}
 .gallery .num{display:block;color:var(--red);font-size:12px;font-weight:700;letter-spacing:.06em;margin-bottom:2px}
-.gallery canvas{height:min(400px,70vw);width:auto;display:block;margin-bottom:8px;border:1px solid var(--rule);background:#fff}
+.gallery canvas{width:100%;height:auto;display:block;margin-bottom:8px;border:1px solid var(--rule);background:#fff}
 .facts{margin:18px 0 0;padding-left:18px;font-size:14.5px;color:#222}
 .facts li{margin-bottom:4px}
 
@@ -147,7 +148,7 @@ td.y{color:#1a7f37;font-weight:600} td.n{color:#ca2b22;font-weight:600}
   <div>
     <div class="logo" role="img" aria-label="심의필"></div>
     <h1>포토부스 진행 상황</h1>
-    <p class="date">2026년 10월 18일 기준 · 가안</p>
+    <p class="date">2026년 10월 18일 기준 · 1차 시안</p>
   </div>
   <div class="cta">
     <a class="mail" href="mailto:hw941027@gmail.com">문의 · hw941027@gmail.com</a>
@@ -328,7 +329,7 @@ document.querySelectorAll('.ipad').forEach(ip=>{
 });
 document.getElementById('archive')?.addEventListener('toggle',()=>drawers.forEach(f=>f())); // 펼칠 때 가이드 캔버스 다시
 const gal=document.getElementById('gallery');
-FR.forEach((f,i)=>{ const fig=document.createElement('figure'); const cv=document.createElement('canvas'); T.compose(cv,[],g(f,FX[0])); fig.appendChild(cv); fig.insertAdjacentHTML('beforeend',`<span class="num">0${i+1}</span>${f.name}<br>${f.sub||''}`); gal.appendChild(fig); });
+FR.forEach((f,i)=>{ const fig=document.createElement('figure'); const cv=document.createElement('canvas'); T.compose(cv,[],g(f,FX[0])); fig.style.flexGrow=(cv.width/cv.height).toFixed(3); fig.appendChild(cv); fig.insertAdjacentHTML('beforeend',`<span class="num">0${i+1}</span>${f.name}<br>${f.sub||''}`); gal.appendChild(fig); });
 const big=new URLSearchParams(location.search).get('big');
 if(big){ document.body.classList.add('big'); document.querySelector(`section[data-opt="${big}"]`)?.classList.add('show'); }
 const fit=()=>document.documentElement.style.setProperty('--s', Math.min(big?1:.5, (document.documentElement.clientWidth-40)/844)); // 아이패드가 창 폭을 넘지 않게
