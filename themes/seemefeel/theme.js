@@ -11,7 +11,7 @@ const WIDE=(()=>{ const L=90,R=F.w-90,top=84,bot=1330,gap=22,w=R-L,h=Math.floor(
 const TALL=(()=>{ const pad=56,gap=28,w=F.fx1-F.fx0-pad*2,h=Math.round(w/1.5),bodyH=pad+4*h+3*gap+pad;
   return {W:F.w, H:F.fy0+bodyH+(F.h-F.floral1), bodyH, rects:[0,1,2,3].map(i=>[F.fx0+pad,F.fy0+pad+i*(h+gap),w,h])}; })();
 // 흰 종이 프레임(실사용) — 여백을 최소로, 컷이 폭을 거의 다 차지. 하단에 도장 하나가 4컷 아래를 물고 사선으로
-const PTALL=(()=>{ const pad=40,gap=20,w=F.w-pad*2,h=Math.round(w/1.5); const r=[0,1,2,3].map(i=>[pad,pad+i*(h+gap),w,h]); const last=r[3];
+const PTALL=(()=>{ const pad=40,gap=28,w=F.w-pad*2,h=Math.round(w/1.5); const r=[0,1,2,3].map(i=>[pad,pad+i*(h+gap),w,h]); const last=r[3];
   return {W:F.w, H:last[1]+last[3]+280, rects:r, stamp:{cx:F.w/2+90, cy:last[1]+last[3]+20, w:760, deg:-15}}; })();
 const LAYOUT={ floral:{wide:WIDE, tall:TALL}, paper:{tall:PTALL} };
 
@@ -43,12 +43,16 @@ function tone(x){ // 망점 — 6px 타일 한 번 만들어 재사용
   return _tone=x.createPattern(c,'repeat');
 }
 const _paper={};
-function paperBg(x,W,H){ // 미색 종이 + 옅은 알갱이. 크기별로 한 번만 그려 캐시
+function paperCanvas(W,H){ // 미색 종이 + 옅은 알갱이. 크기별로 한 번만 그려 캐시
   const k=W+'x'+H; if(!_paper[k]){ const c=document.createElement('canvas'); c.width=W; c.height=H; const q=c.getContext('2d');
     q.fillStyle='#f7f6f2'; q.fillRect(0,0,W,H); let s=1234; const rnd=()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; };
-    q.fillStyle='rgba(60,50,40,.06)'; for(let i=0;i<Math.round(W*H/450);i++) q.fillRect(rnd()*W,rnd()*H,1+rnd()*1.5,1+rnd()*1.5);
+    q.fillStyle='rgba(60,50,40,.08)'; for(let i=0;i<Math.round(W*H/400);i++) q.fillRect(rnd()*W,rnd()*H,1+rnd()*1.5,1+rnd()*1.5);
     _paper[k]=c; }
-  x.drawImage(_paper[k],0,0);
+  return _paper[k];
+}
+function paperBg(x,W,H){ x.drawImage(paperCanvas(W,H),0,0); }
+function printOn(x,W,H,[rx,ry,rw,rh]){ // 사진 위에 종이 질감을 곱한다 — 종이에 인화된 것처럼 알갱이가 비친다
+  x.save(); x.globalCompositeOperation='multiply'; x.drawImage(paperCanvas(W,H),rx,ry,rw,rh,rx,ry,rw,rh); x.restore();
 }
 function seal(x,im,{cx,cy,w,deg}){ // 도장 — multiply로 종이에 스민 느낌
   const h=w*im.naturalHeight/im.naturalWidth;
@@ -110,6 +114,7 @@ export default {
       if(s) cover(x,s,...r); else { x.fillStyle='#bdbdbd'; x.fillRect(...r); }
       if(g.filter.id==='tone'){ x.fillStyle=tone(x); x.fillRect(...r); }
       const p=plan[i]; if(p && ready(g.img[p.img])) host(x,g.img[p.img],...r,p);
+      if(g.frame.paper) printOn(x,L.W,L.H,r);
       border(x,...r);
     });
     if(g.frame.paper && ready(g.img.stamp)) seal(x,g.img.stamp,L.stamp); // 4컷 아래를 물고 찍힌 도장
