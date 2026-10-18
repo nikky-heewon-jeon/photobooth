@@ -57,8 +57,9 @@ header{ width:100%; margin-bottom:32px } /* 로고 아래 여백을 위(.screen 
   min-height:64px; display:flex; flex-direction:column; justify-content:center; padding:10px 6px; line-height:1.2 }
 .chip[aria-pressed="true"]{ color:#fff; background:var(--chip, var(--fg)) }
 #filters .chip{ flex:1 1 45% }
-/* 선 굵기 통일 — 패널·라이브뷰·QR 상자·결과 스트립·버튼(START·SAVE·다시 찍기) 전부 3px 검정 */
+/* 선 굵기 통일 — 패널·라이브뷰·QR 상자·결과 스트립·결과 버튼(SAVE·다시 찍기) 전부 3px 검정. 메인 화면 START만 선 없이 */
 #strip, .btn, .btn-ghost{ border:3px solid var(--line) }
+#shoot{ border:none }
 
 /* 스크린톤을 고르면 라이브뷰에도 망점 — 가이드 레이어 배경으로 얹는다(카운트다운 숫자 아래, 영상 위) */
 body[data-filter="tone"] .guide{
