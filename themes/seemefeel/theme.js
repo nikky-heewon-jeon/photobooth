@@ -22,9 +22,9 @@ const PLAN={
           {img:'pd', side:'L',scale:0.94,down:.12}, null],
   },
   photo:{  // 전신 실사 — 일러스트처럼 상반신만 보이게 키우고, 셋 다 같은 자리(왼쪽에서 11%)에. 팬은 오른쪽
-    wide:[{img:'pcha',side:'L',scale:3.0,down:-.02,anchor:'top',shift:-.02},
-          {img:'pkim',side:'L',scale:3.0,down:-.02,anchor:'top',shift:+.08},
-          {img:'ppd', side:'L',scale:3.0,down:.06,anchor:'top',shift:0}, null], // 김은하: 왼쪽 절반
+    wide:[{img:'pcha',side:'L',scale:3.0,down:-.02,anchor:'top',shift:+.10},  // 하트 손(그림 폭 92%)이 컷 가운데
+          {img:'pkim',side:'L',scale:3.0,down:-.02,anchor:'top',shift:+.17},  // 하트 손이 컷 가운데
+          {img:'ppd', side:'L',scale:3.0,down:.06,anchor:'top',shift:+.10}, null], // 김은하: 오른쪽 변이 컷 49% — 왼쪽 절반
     tall:[{img:'pcha',side:'L',scale:1.9,down:.06,anchor:'top',shift:-.02},  // 하트 손이 컷 가운데 오게 왼쪽으로 — 몸 왼쪽은 잘림
           {img:'pkim',side:'L',scale:1.9,down:.06,anchor:'top',shift:+.08},  // 손(하트)이 컷 가운데
           {img:'ppd', side:'L',scale:1.9,down:.10,anchor:'top',shift:0}, null], // 왼쪽 절반을 차지 — 하트의 왼쪽 반, 팬이 오른쪽 반
