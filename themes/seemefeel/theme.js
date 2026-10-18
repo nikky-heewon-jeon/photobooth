@@ -2,7 +2,7 @@
 // 버전은 frames에 한 줄씩 늘린다. 하단 그림은 draw()가 전부 그린다.
 export default {
   name: '심의필',
-  slug: 'simuipil',
+  slug: 'seemefeel',
   foot: 190,                       // 사진 아래 높이 — 로고가 들어가서 기본(82)보다 크다
   images: { logo: 'assets/logo.png' },
   frames: [
