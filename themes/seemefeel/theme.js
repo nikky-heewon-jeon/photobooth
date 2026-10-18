@@ -21,13 +21,13 @@ const PLAN={
           {img:'kim',side:'C',scale:0.95,down:.14},
           {img:'pd', side:'L',scale:0.94,down:.12}, null],
   },
-  photo:{  // 전신 실사 — 위를 기준으로 세우고 아래(다리)는 컷 밖으로. 셋 다 가장자리에서 가운데 쪽으로 당겨 세운다
-    wide:[{img:'pcha',side:'R',scale:3.0,down:-.02,anchor:'top',shift:-.10},  // 차승우: 왼쪽으로 기울여 손짓 → 오른쪽에
-          {img:'pkim',side:'L',scale:3.0,down:-.02,anchor:'top',shift:+.16},  // 김윤주: 반쪽 하트가 컷 가운데 오게
-          {img:'ppd', side:'R',scale:3.0,down:-.35,anchor:'top',shift:-.10}, null], // 김은하: 팔은 컷 위로
-    tall:[{img:'pcha',side:'R',scale:1.45,down:.05,anchor:'top',shift:-.10},  // 머리 위 여백 5%, 허벅지 위까지 보임
-          {img:'pkim',side:'L',scale:1.45,down:.05,anchor:'top',shift:+.16},  // 손(하트)이 컷 가운데
-          {img:'ppd', side:'R',scale:1.45,down:-.11,anchor:'top',shift:-.10}, null], // 머리 높이를 둘과 맞춤
+  photo:{  // 전신 실사 — 셋 다 같은 자리(왼쪽에서 19%)에 세우고 팬은 오른쪽. 위를 기준으로 내려 다리는 컷 밖으로
+    wide:[{img:'pcha',side:'L',scale:3.0,down:-.02,anchor:'top',shift:+.16},
+          {img:'pkim',side:'L',scale:3.0,down:-.02,anchor:'top',shift:+.16},
+          {img:'ppd', side:'L',scale:3.0,down:-.35,anchor:'top',shift:+.16}, null], // 김은하: 팔은 컷 위로
+    tall:[{img:'pcha',side:'L',scale:1.45,down:.14,anchor:'top',shift:+.16},  // 머리 위 14%, 허리까지만
+          {img:'pkim',side:'L',scale:1.45,down:.14,anchor:'top',shift:+.16},  // 손(하트)이 컷 가운데
+          {img:'ppd', side:'L',scale:1.45,down:-.03,anchor:'top',shift:+.16}, null], // 팔이 위라 머리 높이를 둘과 맞춘 값
   },
 };
 
