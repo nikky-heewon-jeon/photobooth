@@ -1,7 +1,43 @@
-/* 심의필 테마 폰트 — 날짜에 쓰는 타자기체(지은불사에서 쓰던 것).
-   경로는 이 CSS 파일 기준이라 themes/seemefeel/assets/ 로 풀린다. */
+/* 심의필 — 포토부스 화면 자체를 키아트 언어로.
+   검정 여백 + 흰 지면 + 굵은 검정 테두리 + 부크크 명조.
+   폰트는 원본 8MB를 쓰는 글자만 남겨 구웠다. 카피를 바꾸면 `python3 make-fonts.py`. */
 @font-face{
-  font-family:"MomsTypewriter";
-  src:url("assets/moms-typewriter-v2.ttf") format("truetype");
-  font-display:swap;
+  font-family:"BookkMyungjo"; font-weight:300; font-display:swap;
+  src:url("assets/bookk-myungjo-light.ttf") format("truetype");
 }
+@font-face{
+  font-family:"BookkMyungjo"; font-weight:700; font-display:swap;
+  src:url("assets/bookk-myungjo-bold.ttf") format("truetype");
+}
+
+:root{
+  --bg:#141414;      /* 포스터의 검정 여백 */
+  --card:#ffffff;    /* 흰 지면 */
+  --fg:#141414;      /* 지면 위 글자 */
+  --line:#141414;
+  --accent:#ffffff;
+  --primary:#ca2b22; /* 로고 빨강 */
+  --dim:#7c756c;
+}
+body{
+  color:#f2f2f2;
+  font-family:"BookkMyungjo", "Nanum Myeongjo", "Apple SD Gothic Neo", serif;
+}
+
+/* 상단 제목을 로고로 갈음 — 글자는 숨기고 로고를 앉힌다 */
+.mark{
+  font-size:0 !important; line-height:0; height:54px; width:100%; max-width:300px;
+  background:url("assets/logo.png") center/contain no-repeat; margin:0 auto;
+}
+.tag, .qrcap{ color:#a9a29a; font-weight:300 }
+
+/* 포스터의 굵은 패널 테두리 */
+.panel{ border-width:3px }
+#preview{ border-width:2px }
+.brand img{ border:3px solid var(--line); background:#fff }
+
+.lab{ color:var(--dim); letter-spacing:.14em }
+.chip{ border-width:2px; color:var(--fg); font-weight:300 }
+.chip[aria-pressed="true"]{ color:#fff }
+.btn{ font-weight:300; letter-spacing:.06em }
+.btn-ghost{ border-width:2px }

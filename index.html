@@ -61,6 +61,17 @@
   .preview-wrap{display:flex; justify-content:center; margin-top:4px}
   #preview{height:300px; max-width:100%; border:1px solid var(--line); background:var(--accent)}
 
+  /* 좌 브랜드 컬럼 + 우 콘텐츠. 테마가 brand를 안 주면 컬럼은 사라진다 */
+  .capwrap{display:flex; gap:32px; align-items:flex-start; justify-content:center; width:100%; max-width:900px; margin:0 auto}
+  .brand{flex:0 0 280px; display:flex; flex-direction:column; align-items:center; gap:16px}
+  .brand:empty{display:none}
+  .brand img{display:block; width:100%; height:auto}
+  .capmain{flex:1 1 auto; min-width:0; max-width:560px; display:flex; flex-direction:column; align-items:center}
+  @media(max-width:860px){
+    .capwrap{flex-direction:column; align-items:center; gap:16px}
+    .brand{flex:0 0 auto; max-width:230px}
+  }
+
   .result-body{flex:1; display:flex; align-items:center; justify-content:center; padding:4px 0; width:100%}
   #strip{max-width:100%; max-height:60vh; border:1px solid var(--line)}
 
@@ -76,6 +87,9 @@
 <body>
 
 <section class="screen on" id="capScreen">
+  <div class="capwrap">
+    <aside class="brand"></aside>
+    <div class="capmain">
   <header><div class="mark">PHOTO BOOTH</div><div class="tag">테마를 고르면 4컷을 자동으로 찍어드려요</div></header>
   <div class="panel">
     <div class="stage">
@@ -98,14 +112,21 @@
     <div class="preview-wrap"><canvas id="preview"></canvas></div>
   </div>
   <button class="btn btn-go full" id="shoot">START</button>
+    </div>
+  </div>
 </section>
 
 <section class="screen" id="resScreen">
+  <div class="capwrap">
+    <aside class="brand"></aside>
+    <div class="capmain">
   <header><div class="mark">PHOTO BOOTH</div><div class="tag">QR을 찍어 가져가거나 아래로 저장하세요</div></header>
   <div class="result-body"><canvas id="strip"></canvas></div>
   <div class="qrbox" id="qrbox"><div id="qrimg"></div><div class="qrcap" id="qrcap"></div></div>
   <button class="btn btn-go full" id="download">SAVE · PNG 저장</button>
   <button class="btn btn-ghost" id="retake">다시 찍기</button>
+    </div>
+  </div>
 </section>
 
 <script src="qrcode.js"></script>
@@ -135,6 +156,9 @@ document.title=T.name;
 document.querySelectorAll('.mark').forEach(el=>el.textContent=T.name);
 const IMG={}; // 테마가 선언한 이미지를 미리 띄워둔다. draw()에서 g.img.<키>로 쓴다
 for(const [k,path] of Object.entries(T.images||{})){ const i=new Image(); i.src=asset(path); IMG[k]=i; }
+// 화면 좌측 브랜드 컬럼 — 테마가 세울 이미지 목록
+if(T.brand?.length) document.querySelectorAll('.brand').forEach(el=>
+  el.innerHTML=T.brand.map(p=>`<img src="${asset(p)}" alt="">`).join(''));
 if(themeErr) document.querySelector('#capScreen .tag').textContent=`'${THEME_ID}' 테마를 못 찾아 기본 테마로 엽니다`;
 
 let filter=FILTERS[0], frame=T.frames[0], phrase=T.phrases?.[0]||'', shots=[];
@@ -151,7 +175,9 @@ function chips(host, list, render, onPick){
   });
 }
 chips($('filters'), FILTERS, t=>t.name, t=>{filter=t; video.style.filter=t.css; updatePreview();});
-chips($('frames'), T.frames, t=>t.name, t=>{frame=t; updatePreview();});
+// 프레임이 하나뿐인 테마는 FRAME 칸도 숨긴다(고를 게 없는 칩 한 개를 안 보이게)
+if(T.frames.length>1) chips($('frames'), T.frames, t=>t.name, t=>{frame=t; updatePreview();});
+else{ const r=$('frames'); r.previousElementSibling.remove(); r.remove(); }
 // 문구를 안 쓰는 테마는 MESSAGE 칸을 통째로 없앤다(빈 칸이 남지 않게)
 if(T.phrases?.length) chips($('phrases'), T.phrases, t=>t||'없음', t=>{phrase=t; updatePreview();});
 else{ const r=$('phrases'); r.previousElementSibling.remove(); r.remove(); }
@@ -236,13 +262,14 @@ function compose(cv=$('strip'), list=shots){
   const W=PW+PAD*2, H=PAD+SHOTS*PH+(SHOTS-1)*GAP+foot;
   cv.width=W*DPR; cv.height=H*DPR;
   const x=cv.getContext('2d'); x.scale(DPR,DPR);
-  x.fillStyle=frame.bg; x.fillRect(0,0,W,H);
-  list.forEach((s,i)=>x.drawImage(s, PAD, PAD+i*(PH+GAP), PW,PH));
   const baseY=PAD+SHOTS*PH+(SHOTS-1)*GAP;
   const date=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\.$/,'');
+  const geo={W,H,baseY,PAD,PW,PH,GAP,SHOTS,frame,phrase,date,img:IMG,letterSpace};
+  x.fillStyle=frame.bg; x.fillRect(0,0,W,H);
+  list.forEach((s,i)=>x.drawImage(s, PAD, PAD+i*(PH+GAP), PW,PH));
   x.fillStyle=frame.txt; x.textAlign='center';
   // 하단(사진 아래)은 테마가 draw()로 통째로 가져간다. 없으면 기본 문구+날짜.
-  if(T.draw) T.draw(x, {W,H,baseY,PAD,PW,PH,GAP,SHOTS,frame,phrase,date,img:IMG,letterSpace});
+  if(T.draw) T.draw(x, geo);   // 사진 위에 얹히는 것(테두리·망점·로고·날짜)
   else{
     if(phrase){ x.font='600 17px Pretendard,sans-serif'; x.fillText(letterSpace(phrase,1), W/2, baseY+36); }
     x.globalAlpha=.6; x.font='400 12px Pretendard,sans-serif'; x.fillText(letterSpace(date,1), W/2, baseY+58); x.globalAlpha=1;

@@ -1,23 +1,45 @@
-// 심의필 (SEEMEFEEL) — 검은 바탕, 하단에 로고.
-// 버전은 frames에 한 줄씩 늘린다. 하단 그림은 draw()가 전부 그린다.
+// 심의필 (SEEMEFEEL) — KBS KONG 음악 토크쇼.
+// 키아트 언어: 순수 흑백 선화 + 망점(스크린톤) · 굵은 검정 테두리 · 부크크 명조 ·
+// 바닥에 꽉 찬 로고타입 + 태그라인 한 줄.
+const TAGLINE='심의를 준수하는 저품격 음악 토크쇼';
+const RED='#ca2b22';
+
+// 망점(스크린톤) — 4px 타일을 한 번 만들어 재사용한다. 점을 하나씩 찍으면 미리보기가 버벅인다.
+let _tone=null;
+function tone(x){
+  if(_tone) return _tone;
+  const c=document.createElement('canvas'); c.width=c.height=4;
+  const q=c.getContext('2d'); q.fillStyle='rgba(10,10,10,.32)';
+  q.fillRect(0,0,1.5,1.5); q.fillRect(2,2,1.5,1.5);
+  return _tone=x.createPattern(c,'repeat');
+}
+const cuts=g=>Array.from({length:g.SHOTS},(_,i)=>[g.PAD, g.PAD+i*(g.PH+g.GAP), g.PW, g.PH]);
+
 export default {
   name: '심의필',
   slug: 'seemefeel',
-  foot: 170,                       // 사진 아래 높이 — 로고가 들어가서 기본(82)보다 크다
-  css: 'theme.css',                // 날짜용 타자기 폰트
-  images: { logo: 'assets/logo.png' },
+  foot: 196,
+  css: 'theme.css',
+  brand: ['assets/illust.jpg'],          // 화면 왼쪽에 세우는 키아트
+  images: { logo: 'assets/logo.png' },   // 스트립 하단 로고(빨강)
   frames: [
-    {id:'black', name:'기본', bg:'#0a0a0a', txt:'#ca2b22'}, // txt = 로고에서 뽑은 빨강
+    {id:'tone', name:'기본', bg:'#0a0a0a', txt:RED},
   ],
-  // phrases 없음 — 문구 칸을 안 쓴다(엔진이 칸 자체를 숨긴다)
   draw(x, g){
-    const L=g.img.logo;
+    x.fillStyle=tone(x);                                  // 사진에 망점을 덮어 만화 인화처럼
+    cuts(g).forEach(([cx,cy,cw,ch])=>x.fillRect(cx,cy,cw,ch));
+    x.strokeStyle='rgba(255,255,255,.5)'; x.lineWidth=1;
+    cuts(g).forEach(([cx,cy,cw,ch])=>x.strokeRect(cx-.5,cy-.5,cw+1,ch+1));
+
+    const L=g.img.logo; let lh=0;
     if(L && L.complete && L.naturalWidth){
-      const lw=g.W*0.62, lh=lw*L.naturalHeight/L.naturalWidth;
-      x.drawImage(L, (g.W-lw)/2, g.baseY+30, lw, lh);
+      const lw=g.W*0.72; lh=lw*L.naturalHeight/L.naturalWidth;
+      x.drawImage(L, (g.W-lw)/2, g.baseY+26, lw, lh);
     }
-    x.fillStyle=g.frame.txt; x.textAlign='center';
-    x.font='400 13px "MomsTypewriter", monospace'; // 로고 빨강 그대로 — 검정 위에서 흐려지지 않게 알파를 뺐다
-    x.fillText(g.letterSpace(g.date,1), g.W/2, g.baseY+152);
+    x.textAlign='center';
+    x.fillStyle='rgba(255,255,255,.72)'; x.font='300 11px "BookkMyungjo", serif';
+    x.fillText(TAGLINE, g.W/2, g.baseY+48+lh);
+    x.fillStyle=RED; x.font='300 12px "BookkMyungjo", serif';
+    x.fillText(g.letterSpace(g.date,1), g.W/2, g.baseY+70+lh);
   },
 };
