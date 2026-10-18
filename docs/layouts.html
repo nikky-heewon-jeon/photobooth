@@ -54,9 +54,19 @@ h1,h2{font-weight:700;letter-spacing:-0.02em}
 .ask p.warn b{display:block;color:var(--red);font-size:12px;letter-spacing:.04em;margin-bottom:2px}
 
 /* 프레임 5종 */
-.gallery{display:flex;gap:18px;align-items:flex-start}
-.gallery figure{margin:0;flex:1 1 0;min-width:0;text-align:center;font-size:12.5px;color:#333;line-height:1.4} /* flex-grow는 스크립트가 프레임 비율로 준다 → 높이가 같아진다 */
-@media(max-width:640px){.gallery{flex-wrap:wrap} .gallery figure{flex-basis:30%}}
+.gallery{display:flex;gap:34px;align-items:flex-start;max-width:720px} /* 작게, 여백 넉넉히. 클릭하면 크게 */
+.gallery figure{margin:0;flex:1 1 0;min-width:0;text-align:center;font-size:12.5px;color:#333;line-height:1.4;cursor:zoom-in} /* flex-grow는 스크립트가 프레임 비율로 준다 → 높이가 같아진다 */
+.gallery figure:hover canvas{outline:3px solid var(--red);outline-offset:-1px}
+@media(max-width:640px){.gallery{flex-wrap:wrap;gap:20px} .gallery figure{flex-basis:30%}}
+/* 확대 보기 */
+.lb{position:fixed;inset:0;background:rgba(20,20,20,.88);display:flex;align-items:center;justify-content:center;z-index:50;padding:24px}
+.lb[hidden]{display:none}
+.lb-in{display:flex;flex-direction:column;align-items:center;gap:14px;max-height:100%}
+.lb img{max-height:calc(100vh - 130px);max-width:min(92vw,900px);width:auto;height:auto;background:#fff;display:block}
+.lb-bar{display:flex;gap:10px;align-items:center;color:#fff;font-size:14px;flex-wrap:wrap;justify-content:center}
+.lb-bar span{margin-right:8px}
+.lb-btn{background:var(--red);color:#fff;padding:10px 16px;text-decoration:none;font-weight:700;border:none;font:inherit;font-size:14px;cursor:pointer}
+.lb-btn.ghost{background:transparent;border:2px solid #fff}
 .gallery .num{display:block;color:var(--red);font-size:12px;font-weight:700;letter-spacing:.06em;margin-bottom:2px}
 .gallery canvas{width:100%;height:auto;display:block;margin-bottom:8px;border:1px solid var(--rule);background:#fff}
 .facts{margin:18px 0 0;padding-left:18px;font-size:14.5px;color:#222}
@@ -136,9 +146,6 @@ td.y{color:#1a7f37;font-weight:600} td.n{color:#ca2b22;font-weight:600}
 .slots{display:flex;gap:12px;margin:18px 0;flex:none}
 .slot{flex:1;aspect-ratio:3/2;border:2px solid #141414;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;color:#c9c5bd}
 .slot.on{background:#bdbdbd;color:#141414}
-.gallery{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
-.gallery figure{margin:0;text-align:center;font-size:12px;color:#555}
-.gallery canvas{height:min(520px, 60vw);width:auto;display:block;margin-bottom:6px;border:1px solid #bbb}
 </style>
 </head>
 <body>
@@ -176,7 +183,7 @@ td.y{color:#1a7f37;font-weight:600} td.n{color:#ca2b22;font-weight:600}
 
 <section class="sec">
   <h2><span class="n">03</span>구성 내용</h2>
-  <p class="lead">뼈다귀 효과 5종입니다. 사진 영역은 회색으로 비워 두었습니다.</p>
+  <p class="lead">뼈다귀 효과 5종입니다. 사진 영역은 회색으로 비워 두었습니다. 프레임을 클릭하면 크게 볼 수 있고 PNG로 내려받을 수 있습니다.</p>
   <div class="gallery" id="gallery"></div>
   <ul class="facts">
     <li>화면 효과 2종: 오리지널, 스크린톤.</li>
@@ -300,6 +307,7 @@ td.y{color:#1a7f37;font-weight:600} td.n{color:#ca2b22;font-weight:600}
 </details>
 
 </div>
+<div class="lb" id="lb" hidden><div class="lb-in"><img id="lbimg" alt=""><div class="lb-bar"><span id="lbcap"></span><a id="lbdl" class="lb-btn" download>PNG 다운로드</a><button id="lbclose" class="lb-btn ghost" type="button">닫기</button></div></div></div>
 <script type="module">
 import T from '../themes/seemefeel/theme.js';
 const IMG={};
@@ -328,8 +336,18 @@ document.querySelectorAll('.ipad').forEach(ip=>{
   draw(); drawers.push(draw);
 });
 document.getElementById('archive')?.addEventListener('toggle',()=>drawers.forEach(f=>f())); // 펼칠 때 가이드 캔버스 다시
-const gal=document.getElementById('gallery');
-FR.forEach((f,i)=>{ const fig=document.createElement('figure'); const cv=document.createElement('canvas'); T.compose(cv,[],g(f,FX[0])); fig.style.flexGrow=(cv.width/cv.height).toFixed(3); fig.appendChild(cv); fig.insertAdjacentHTML('beforeend',`<span class="num">0${i+1}</span>${f.name}<br>${f.sub||''}`); gal.appendChild(fig); });
+const gal=document.getElementById('gallery'), items=[];
+FR.forEach((f,i)=>{ const fig=document.createElement('figure'); const cv=document.createElement('canvas'); T.compose(cv,[],g(f,FX[0])); fig.style.flexGrow=(cv.width/cv.height).toFixed(3); fig.appendChild(cv); fig.insertAdjacentHTML('beforeend',`<span class="num">0${i+1}</span>${f.name}<br>${f.sub||''}`); gal.appendChild(fig);
+  items.push({cv, cap:`0${i+1} ${f.name} ${f.sub||''}`, file:`seemefeel-0${i+1}-${f.name}-${(f.sub||'').replace(/\s+/g,'_')}.png`}); fig.onclick=()=>openLb(i); });
+// 확대 보기 + PNG 내려받기
+const lb=document.getElementById('lb'), lbimg=document.getElementById('lbimg'), lbcap=document.getElementById('lbcap'), lbdl=document.getElementById('lbdl');
+let cur=0;
+function openLb(i){ cur=i; const it=items[i]; const url=it.cv.toDataURL('image/png'); lbimg.src=url; lbcap.textContent=it.cap; lbdl.href=url; lbdl.download=it.file; lb.hidden=false; }
+const closeLb=()=>{ lb.hidden=true; };
+document.getElementById('lbclose').onclick=closeLb;
+lb.addEventListener('click',e=>{ if(e.target===lb) closeLb(); });
+addEventListener('keydown',e=>{ if(lb.hidden) return; if(e.key==='Escape') closeLb(); if(e.key==='ArrowRight') openLb((cur+1)%items.length); if(e.key==='ArrowLeft') openLb((cur+items.length-1)%items.length); });
+if(new URLSearchParams(location.search).has('lb')) openLb(+new URLSearchParams(location.search).get('lb')||0);
 const big=new URLSearchParams(location.search).get('big');
 if(big){ document.body.classList.add('big'); document.querySelector(`section[data-opt="${big}"]`)?.classList.add('show'); }
 const fit=()=>document.documentElement.style.setProperty('--s', Math.min(big?1:.5, (document.documentElement.clientWidth-40)/844)); // 아이패드가 창 폭을 넘지 않게
