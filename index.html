@@ -34,6 +34,7 @@
   .stage{position:relative; width:100%; aspect-ratio:3/2; border-radius:var(--r-lg); overflow:hidden;
     background:#000; border:1px solid var(--line)}
   video{width:100%; height:100%; object-fit:cover; transform:scaleX(-1)}
+  .guide{position:absolute; inset:0; width:100%; height:100%; pointer-events:none} /* 테마가 그리는 촬영 가이드(출연자 자리·잘리는 영역) */
   .count{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
     font-size:140px; font-weight:700; color:#fff; text-shadow:0 4px 40px rgba(0,0,0,.7);
     background:rgba(0,0,0,.2); pointer-events:none}
@@ -94,6 +95,7 @@
   <div class="panel">
     <div class="stage">
       <video id="cam" autoplay playsinline muted></video>
+      <canvas class="guide" id="guide"></canvas>
       <div class="flash" id="flash"></div>
       <div class="progress" id="prog"></div>
       <div class="count" id="count" style="display:none"></div>
@@ -177,7 +179,7 @@ function chips(host, list, render, onPick){
 }
 chips($('filters'), FX, t=>t.name, t=>{filter=t; video.style.filter=t.css; updatePreview();});
 // 프레임이 하나뿐인 테마는 FRAME 칸도 숨긴다(고를 게 없는 칩 한 개를 안 보이게)
-if(T.frames.length>1) chips($('frames'), T.frames, t=>t.name, t=>{frame=t; updatePreview();});
+if(T.frames.length>1) chips($('frames'), T.frames, t=>t.name, t=>{frame=t; updatePreview(); drawGuide(0);});
 else{ const r=$('frames'); r.previousElementSibling.remove(); r.remove(); }
 // 문구를 안 쓰는 테마는 MESSAGE 칸을 통째로 없앤다(빈 칸이 남지 않게)
 if(T.phrases?.length) chips($('phrases'), T.phrases, t=>t||'없음', t=>{phrase=t; updatePreview();});
@@ -186,7 +188,7 @@ else{ const r=$('phrases'); r.previousElementSibling.remove(); r.remove(); }
 (async()=>{
   try{
     const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:1920},height:{ideal:1080}},audio:false});
-    video.srcObject=stream;
+    video.srcObject=stream; video.onloadedmetadata=()=>drawGuide(0);
   }catch(e){
     $('err').style.display='block'; $('err').innerHTML='카메라 권한이 필요해요.<br>iPad 설정 > Safari > 카메라에서 허용해 주세요.';
     $('shoot').disabled=true;
@@ -194,6 +196,14 @@ else{ const r=$('phrases'); r.previousElementSibling.remove(); r.remove(); }
 })();
 
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
+
+// 촬영 가이드 — 테마가 guide()를 주면 i번째 컷에 맞춰 라이브뷰 위에 그린다(출연자 반투명·잘리는 영역)
+function drawGuide(i){
+  const g=$('guide'); if(!T.guide){ g.width=g.height=0; return; }
+  const r=g.getBoundingClientRect(); g.width=Math.round(r.width*2); g.height=Math.round(r.height*2);
+  const x=g.getContext('2d'); x.clearRect(0,0,g.width,g.height);
+  T.guide(x, {i, W:g.width, H:g.height, frame, img:IMG});
+}
 
 function drawCover(ctx,dw,dh){
   const vw=video.videoWidth, vh=video.videoHeight;
@@ -222,6 +232,7 @@ async function shoot(){
   $('shoot').disabled=true; shots=[]; prog.style.display='block';
   let pending=null;
   for(let i=0;i<SHOTS;i++){
+    drawGuide(i);
     prog.textContent=`${i+1} / ${SHOTS}`; count.style.display='flex';
     for(let n=3;n>0;n--){ count.textContent=n; await wait(800); }
     count.textContent='●'; await wait(150);
@@ -231,7 +242,7 @@ async function shoot(){
     await wait(550);
   }
   prog.style.display='none'; $('shoot').disabled=false; busy=false;
-  show('resScreen'); makeQR(pending);
+  drawGuide(0); show('resScreen'); makeQR(pending);
 }
 
 function startUpload(){ // 스트립을 JPEG로 인코딩 후 업로드 → secure_url 반환(진행 중 Promise)
@@ -259,12 +270,14 @@ async function makeQR(pending){
 function letterSpace(s,n){ return s.split('').join(' '.repeat(n)); }
 
 function compose(cv=$('strip'), list=shots){
+  const date=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\.$/,'');
+  // 테마가 compose()를 주면 캔버스 크기·배치·배경까지 통째로 가져간다(아래 기본 스트립은 건너뜀)
+  if(T.compose) return T.compose(cv, list, {frame,filter,phrase,date,img:IMG,letterSpace});
   const foot=T.foot||FOOT; // 테마가 하단 높이를 키울 수 있다(로고 등)
   const W=PW+PAD*2, H=PAD+SHOTS*PH+(SHOTS-1)*GAP+foot;
   cv.width=W*DPR; cv.height=H*DPR;
   const x=cv.getContext('2d'); x.scale(DPR,DPR);
   const baseY=PAD+SHOTS*PH+(SHOTS-1)*GAP;
-  const date=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\.$/,'');
   const geo={W,H,baseY,PAD,PW,PH,GAP,SHOTS,frame,filter,phrase,date,img:IMG,letterSpace};
   x.fillStyle=frame.bg; x.fillRect(0,0,W,H);
   list.forEach((s,i)=>x.drawImage(s, PAD, PAD+i*(PH+GAP), PW,PH));
