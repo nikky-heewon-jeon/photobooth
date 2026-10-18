@@ -73,7 +73,7 @@
   body[data-preview="side"] #pv .lab{margin-top:0}
   body[data-preview="side"] #preview{width:100%; height:auto}
   /* 결과 화면 — 왼쪽 스트립, 오른쪽 열에 QR·SAVE·다시 찍기(전부 열 폭 = 같은 크기) */
-  body[data-preview="side"] #resScreen .capmain{grid-template-areas:"head head" "strip side"}
+  body[data-preview="side"] #resScreen .capmain{grid-template-areas:"head head" "strip side"; grid-template-columns:auto 300px; justify-content:center} /* 스트립 폭만큼만 열을 잡고 가운데로 — QR과 바짝 */
   body[data-preview="side"] .result-body{grid-area:strip; padding:0; align-items:flex-start}
   body[data-preview="side"] #strip{max-height:calc(100vh - 290px)}
   body[data-preview="side"] #side{grid-area:side; max-width:none}

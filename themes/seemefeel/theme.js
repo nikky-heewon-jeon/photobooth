@@ -48,22 +48,7 @@ function tone(x){ // 망점 — 6px 타일 한 번 만들어 재사용
   q.beginPath(); q.arc(1.5,1.5,1.5,0,7); q.arc(4.5,4.5,1.5,0,7); q.fill();
   return _tone=x.createPattern(c,'repeat');
 }
-const _paper={};
-function paperCanvas(W,H,base='#fcfbf9'){ // 종이 질감 — 알갱이 + 섬유결 + 옅은 얼룩. base는 종이 색. 크기·색별로 한 번만 그려 캐시
-  const k=W+'x'+H+base; if(!_paper[k]){ const c=document.createElement('canvas'); c.width=W; c.height=H; const q=c.getContext('2d');
-    let s=1234; const rnd=()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; };
-    q.fillStyle=base; q.fillRect(0,0,W,H);
-    for(let i=0;i<7;i++){ const px=rnd()*W,py=rnd()*H,r=200+rnd()*320; const g=q.createRadialGradient(px,py,0,px,py,r); g.addColorStop(0,'rgba(60,60,60,.045)'); g.addColorStop(1,'rgba(60,60,60,0)'); q.fillStyle=g; q.fillRect(px-r,py-r,r*2,r*2); } // 톤 얼룩
-    q.strokeStyle='rgba(70,70,70,.15)'; q.lineWidth=1;
-    for(let i=0;i<Math.round(W*H/1100);i++){ const px=rnd()*W,py=rnd()*H,a=rnd()*Math.PI,l=5+rnd()*16; q.beginPath(); q.moveTo(px,py); q.lineTo(px+Math.cos(a)*l,py+Math.sin(a)*l); q.stroke(); } // 섬유결
-    q.fillStyle='rgba(50,50,50,.135)'; for(let i=0;i<Math.round(W*H/300);i++) q.fillRect(rnd()*W,rnd()*H,1+rnd()*1.5,1+rnd()*1.5); // 알갱이
-    _paper[k]=c; }
-  return _paper[k];
-}
-function paperBg(x,W,H,base){ x.drawImage(paperCanvas(W,H,base),0,0); }
-function printOn(x,W,H,[rx,ry,rw,rh]){ // 사진 위에 종이 질감을 곱한다 — 종이에 인화된 것처럼 알갱이가 비친다 (항상 흰 바탕 기준)
-  x.save(); x.globalCompositeOperation='multiply'; x.globalAlpha=.55; x.drawImage(paperCanvas(W,H,'#ffffff'),rx,ry,rw,rh,rx,ry,rw,rh); x.restore();
-}
+function paperBg(x,W,H,base='#fcfbf9'){ x.fillStyle=base; x.fillRect(0,0,W,H); } // 종이 — 색만(살짝 따뜻한 흰색). 질감(알갱이·섬유결)은 뺐다
 const _tint={};
 function tintOf(im,color){ // 흰 도장을 color로 물들인다(알파·질감 그대로). 이미지·색별로 한 번만
   const k=im.src+color; if(!_tint[k]){ const c=document.createElement('canvas'); c.width=im.naturalWidth; c.height=im.naturalHeight; const q=c.getContext('2d');
@@ -145,7 +130,6 @@ export default {
       const p=plan[i];
       if(p && ready(g.img[p.img])){ const o=host(x,g.img[p.img],...r,p);
         (p.censor||[]).forEach(([cx0,cy0,cw0,ch0,B=9])=>{ const q=clipRect([o.px+cx0*o.s,o.py+cy0*o.s,cw0*o.s,ch0*o.s],r); if(q) pixelate(x,cv,q,B*o.s); }); } // B=9면 구워 둔 눈 모자이크와 같은 블록
-      if(g.frame.paper) printOn(x,L.W,L.H,r);
       if(g.frame.cutLine!==false) border(x,...r); // cutLine:false — 컷마다 두르는 검정 선을 뺀다(종이에 인화된 사진처럼)
     });
     if(g.frame.edge){ x.strokeStyle='#141414'; x.lineWidth=g.frame.edge; x.strokeRect(g.frame.edge/2,g.frame.edge/2,L.W-g.frame.edge,L.H-g.frame.edge); } // edge — 종이 바깥을 두르는 검정 선(px)
