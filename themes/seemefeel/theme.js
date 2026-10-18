@@ -117,8 +117,8 @@ export default {
     {id:'tall-i', name:'일러스트', sub:'세로 버-전',          layout:'tall', cast:'illust',     bg:'#0a0a0a', txt:RED},
     {id:'tall-p', name:'심의필',   sub:'오리지날-버-전',      layout:'tall', cast:'photo',      paper:true, bg:'#f7f6f2', txt:RED, color:RED}, // paper: 꽃 대신 흰 종이 + 도장
     {id:'tall-g', name:'심의필',   sub:'스페-샬 게스트 버-전', layout:'tall', cast:'photoGuest', paper:true, bg:'#f7f6f2', txt:RED, color:RED}, // 4컷에 김간지
-    {id:'tall-g2',name:'심의미필', sub:'스페-샬 게스트 버-전', layout:'tall', cast:'photoGuestM', paper:true, paperColor:'#141414', bg:'#141414', txt:'#d4ff3a', color:'#787878',
-     stamp:{key:'stamp2w', w:860, cx:600, blend:'source-over', color:'#d4ff3a'}}, // 검정 종이 + 눈 모자이크 + 형광 연두 심의미필 도장(흰 도장을 물들임). 칩은 회색(형광은 흰 칩에서 안 읽힘)
+    {id:'tall-g2',name:'심의미필', sub:'스페-샬 게스트 버-전', layout:'tall', cast:'photoGuestM', paper:true, paperColor:'#141414', bg:'#141414', txt:'#d7000f', color:'#787878',
+     stamp:{key:'stamp2w', w:860, cx:600, blend:'source-over', color:'#d7000f'}}, // 검정 종이 + 눈 모자이크 + 빨간 심의미필 도장(흰 도장을 도장 원본 빨강으로 물들임 — 속빈 곳은 검정 종이가 비침). 칩은 회색
   ],
 
   // 스트립 전체를 그린다 — 캔버스 크기·배경·컷·출연자·테두리
