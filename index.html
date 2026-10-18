@@ -161,7 +161,8 @@ if(T.brand?.length) document.querySelectorAll('.brand').forEach(el=>
   el.innerHTML=T.brand.map(p=>`<img src="${asset(p)}" alt="">`).join(''));
 if(themeErr) document.querySelector('#capScreen .tag').textContent=`'${THEME_ID}' 테마를 못 찾아 기본 테마로 엽니다`;
 
-let filter=FILTERS[0], frame=T.frames[0], phrase=T.phrases?.[0]||'', shots=[];
+const FX=T.filters||FILTERS;   // 테마가 자기 필터를 주면 그걸 쓴다(기본 목록은 건드리지 않는다)
+let filter=FX[0], frame=T.frames[0], phrase=T.phrases?.[0]||'', shots=[];
 
 const $=id=>document.getElementById(id);
 const video=$('cam'), flash=$('flash'), count=$('count'), prog=$('prog');
@@ -174,7 +175,7 @@ function chips(host, list, render, onPick){
     host.appendChild(b);
   });
 }
-chips($('filters'), FILTERS, t=>t.name, t=>{filter=t; video.style.filter=t.css; updatePreview();});
+chips($('filters'), FX, t=>t.name, t=>{filter=t; video.style.filter=t.css; updatePreview();});
 // 프레임이 하나뿐인 테마는 FRAME 칸도 숨긴다(고를 게 없는 칩 한 개를 안 보이게)
 if(T.frames.length>1) chips($('frames'), T.frames, t=>t.name, t=>{frame=t; updatePreview();});
 else{ const r=$('frames'); r.previousElementSibling.remove(); r.remove(); }
@@ -264,7 +265,7 @@ function compose(cv=$('strip'), list=shots){
   const x=cv.getContext('2d'); x.scale(DPR,DPR);
   const baseY=PAD+SHOTS*PH+(SHOTS-1)*GAP;
   const date=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\.$/,'');
-  const geo={W,H,baseY,PAD,PW,PH,GAP,SHOTS,frame,phrase,date,img:IMG,letterSpace};
+  const geo={W,H,baseY,PAD,PW,PH,GAP,SHOTS,frame,filter,phrase,date,img:IMG,letterSpace};
   x.fillStyle=frame.bg; x.fillRect(0,0,W,H);
   list.forEach((s,i)=>x.drawImage(s, PAD, PAD+i*(PH+GAP), PW,PH));
   x.fillStyle=frame.txt; x.textAlign='center';

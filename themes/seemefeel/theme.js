@@ -22,12 +22,18 @@ export default {
   css: 'theme.css',
   brand: ['assets/illust.jpg'],          // 화면 왼쪽에 세우는 키아트
   images: { logo: 'assets/logo.png' },   // 스트립 하단 로고(빨강)
+  filters: [
+    {id:'original', name:'오리지널', css:'none'},
+    {id:'tone',     name:'스크린톤', css:'grayscale(1) contrast(1.18)'},
+  ],
   frames: [
     {id:'tone', name:'기본', bg:'#0a0a0a', txt:RED},
   ],
   draw(x, g){
-    x.fillStyle=tone(x);                                  // 사진에 망점을 덮어 만화 인화처럼
-    cuts(g).forEach(([cx,cy,cw,ch])=>x.fillRect(cx,cy,cw,ch));
+    if(g.filter.id==='tone'){                             // 흑백일 때만 망점을 덮어 만화 인화처럼
+      x.fillStyle=tone(x);
+      cuts(g).forEach(([cx,cy,cw,ch])=>x.fillRect(cx,cy,cw,ch));
+    }
     x.strokeStyle='rgba(255,255,255,.5)'; x.lineWidth=1;
     cuts(g).forEach(([cx,cy,cw,ch])=>x.strokeRect(cx-.5,cy-.5,cw+1,ch+1));
 
