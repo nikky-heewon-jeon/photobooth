@@ -36,6 +36,7 @@ const PLAN={
 PLAN.photoGuest={ tall:[...PLAN.photo.tall.slice(0,3), {img:'pgan',side:'R',scale:1.9,down:.06,anchor:'top'}] };
 // 심의미필 버전 — 같은 배치, 눈에 모자이크를 미리 구워 둔 사진(m*)으로
 PLAN.photoGuestM={ tall:PLAN.photoGuest.tall.map(p=>p&&{...p, img:'m'+p.img.slice(1)}) };
+PLAN.photoGuestM.tall[3].censor=[[-25,172,120,120,18],[272,200,120,120,18]]; // 김간지 양손 — 손가락·주먹 주변까지 정사각형(그림 px 기준, 마지막은 블록 크기). 합성 때 뒤의 사진째 굵게 모자이크해 손짓이 안 읽히게
 
 const ready=im=>im&&im.complete&&im.naturalWidth>0;
 let _tone=null;
@@ -82,7 +83,14 @@ function host(x,im,dx,dy,dw,dh,{side,scale,down=0,anchor='bottom',shift=0}){ // 
   const px = (side==='L'? dx+inset : side==='R'? dx+dw-w-inset : dx+(dw-w)/2) + dw*shift; // shift: 컷 폭 대비 좌우 이동(+오른쪽)
   const py = anchor==='top' ? dy+dh*down : dy+dh-h+dh*down;
   x.save(); x.beginPath(); x.rect(dx,dy,dw,dh); x.clip(); x.drawImage(im,px,py,w,h); x.restore();
+  return {px,py,s:h/im.naturalHeight}; // 그림 px → 캔버스 px 변환용
 }
+function pixelate(x,cv,[rx,ry,rw,rh],B){ // 캔버스의 그 영역을 B px 블록 모자이크로(TV 모자이크 — 사람·배경 사진 가리지 않고 전부)
+  const bw=Math.max(1,Math.round(rw/B)), bh=Math.max(1,Math.round(rh/B)), c=document.createElement('canvas'); c.width=bw; c.height=bh;
+  c.getContext('2d').drawImage(cv,rx,ry,rw,rh,0,0,bw,bh);
+  x.save(); x.imageSmoothingEnabled=false; x.drawImage(c,0,0,bw,bh,rx,ry,rw,rh); x.restore();
+}
+const clipRect=([ax,ay,aw,ah],[bx,by,bw,bh])=>{ const x0=Math.max(ax,bx),y0=Math.max(ay,by),x1=Math.min(ax+aw,bx+bw),y1=Math.min(ay+ah,by+bh); return x1>x0&&y1>y0?[x0,y0,x1-x0,y1-y0]:null; };
 function border(x,dx,dy,dw,dh){ x.strokeStyle='#141414'; x.lineWidth=4; x.strokeRect(dx-2,dy-2,dw+4,dh+4); }
 function tallBg(x,fr){ // 상단 테두리 + 꽃 지면 거울 타일(이음새 없음) + 로고 밴드
   const logoBand=F.h-F.floral1, bodyH=TALL.bodyH;
@@ -132,7 +140,9 @@ export default {
       const s=shots[i];
       if(s) cover(x,s,...r); else { x.fillStyle='#bdbdbd'; x.fillRect(...r); }
       if(g.filter.id==='tone'){ x.fillStyle=tone(x); x.fillRect(...r); }
-      const p=plan[i]; if(p && ready(g.img[p.img])) host(x,g.img[p.img],...r,p);
+      const p=plan[i];
+      if(p && ready(g.img[p.img])){ const o=host(x,g.img[p.img],...r,p);
+        (p.censor||[]).forEach(([cx0,cy0,cw0,ch0,B=9])=>{ const q=clipRect([o.px+cx0*o.s,o.py+cy0*o.s,cw0*o.s,ch0*o.s],r); if(q) pixelate(x,cv,q,B*o.s); }); } // B=9면 구워 둔 눈 모자이크와 같은 블록
       if(g.frame.paper) printOn(x,L.W,L.H,r);
       border(x,...r);
     });
