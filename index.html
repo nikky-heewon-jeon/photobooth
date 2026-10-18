@@ -261,10 +261,9 @@ function snap(){
 
 let busy=false;
 function updatePreview(){
-  if(busy) return;
   if(!video.videoWidth){ compose($('preview'), []); return; } // 카메라가 뜨기 전(또는 거부)엔 빈 컷으로 프레임만 보여준다
   const s=snap();
-  compose($('preview'), Array(SHOTS).fill(s));
+  compose($('preview'), Array.from({length:SHOTS},(_,i)=>shots[i]||s)); // 찍힌 컷은 그대로 쌓이고, 아직 안 찍은 컷엔 라이브가 비친다
 }
 
 async function shoot(){
@@ -333,7 +332,7 @@ function compose(cv=$('strip'), list=shots){
 function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id===id)); window.scrollTo(0,0); }
 
 $('shoot').onclick=shoot;
-$('retake').onclick=()=>show('capScreen');
+$('retake').onclick=()=>{ shots=[]; show('capScreen'); }; // 다시 찍기 — 쌓인 컷을 비워 미리보기가 다시 전부 라이브로
 setInterval(()=>{ if($('capScreen').classList.contains('on')) updatePreview(); }, 450);
 // 테마 웹폰트가 늦게 뜨면 캔버스가 대체 폰트로 그려지므로, 로드 후 한 번 다시 그린다
 if(document.fonts) document.fonts.ready.then(()=>{ if($('capScreen').classList.contains('on')) updatePreview(); });
