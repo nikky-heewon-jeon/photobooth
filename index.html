@@ -46,10 +46,11 @@
 
   .lab{font-size:12px; letter-spacing:.02em; color:var(--dim); margin:22px 0 11px; font-weight:500}
   .row{display:flex; gap:9px; flex-wrap:wrap}
-  .chip{flex:1 1 0; min-width:80px; background:var(--accent); border:1px solid var(--line); color:var(--dim);
+  .chip{flex:1 1 0; min-width:80px; background:var(--accent); border:1px solid var(--chip,var(--line)); color:var(--chip,var(--dim));
     border-radius:var(--r-md); padding:14px 8px; font-size:15px; font-family:inherit; cursor:pointer; text-align:center; font-weight:500;
     transition:color var(--dur) var(--ease), background var(--dur) var(--ease), border-color var(--dur) var(--ease)}
-  .chip[aria-pressed="true"]{color:#fff; background:var(--fg); border-color:var(--fg)}
+  .chip[aria-pressed="true"]{color:#fff; background:var(--chip,var(--fg)); border-color:var(--chip,var(--fg))}
+  .chip small{display:block; font-size:11px; margin-top:4px; white-space:nowrap} /* 둘째 줄(sub) — 항상 한 줄 */
 
   .btn{width:100%; max-width:560px; padding:18px; border:none; border-radius:var(--r-md); font-size:17px; font-weight:600;
     font-family:inherit; cursor:pointer; letter-spacing:.02em; transition:opacity var(--dur) var(--ease)}
@@ -147,7 +148,7 @@ const SHOTS=4, PW=400, PH=267, PAD=24, GAP=14, FOOT=82, DPR=3;
 
 // ── 테마 로드 ──────────────────────────────────────────────────────
 // ?theme=<폴더명> → themes/<폴더명>/theme.js. 없거나 못 읽으면 base로 떨어진다.
-// 테마 계약: {name, slug, frames:[{id,name,bg,txt}], phrases:[], css?}
+// 테마 계약: {name, slug, frames:[{id,name,sub?,color?,bg,txt}], phrases:[], css?}
 const THEME_ID=new URLSearchParams(location.search).get('theme')||'base';
 const asset=p=>`themes/${THEME_ID}/${p}`; // 테마 폴더 기준으로 경로 해석
 let T, themeErr=false;
@@ -173,14 +174,16 @@ function chips(host, list, render, onPick){
   list.forEach((t,i)=>{
     const b=document.createElement('button');
     b.className='chip'; b.setAttribute('aria-pressed', i===0); b.innerHTML=render(t);
+    if(t.color) b.style.setProperty('--chip', t.color); // 칩 색(테두리·글자, 고르면 채움) — 계열 구분용
     b.onclick=()=>{ onPick(t); [...host.children].forEach((c,j)=>c.setAttribute('aria-pressed', j===i)); };
     host.appendChild(b);
   });
 }
-chips($('filters'), FX, t=>t.name, t=>{filter=t; video.style.filter=t.css; document.body.dataset.filter=t.id; updatePreview();});
+const label=t=>t.sub?`${t.name}<small>${t.sub}</small>`:t.name; // sub가 있으면 둘째 줄에 작게
+chips($('filters'), FX, label, t=>{filter=t; video.style.filter=t.css; document.body.dataset.filter=t.id; updatePreview();});
 document.body.dataset.filter=filter.id; // 테마 CSS가 필터별로 라이브뷰 위에 효과를 얹을 수 있게
 // 프레임이 하나뿐인 테마는 FRAME 칸도 숨긴다(고를 게 없는 칩 한 개를 안 보이게)
-if(T.frames.length>1) chips($('frames'), T.frames, t=>t.name, t=>{frame=t; updatePreview(); drawGuide(0);});
+if(T.frames.length>1) chips($('frames'), T.frames, label, t=>{frame=t; updatePreview(); drawGuide(0);});
 else{ const r=$('frames'); r.previousElementSibling.remove(); r.remove(); }
 // 문구를 안 쓰는 테마는 MESSAGE 칸을 통째로 없앤다(빈 칸이 남지 않게)
 if(T.phrases?.length) chips($('phrases'), T.phrases, t=>t||'없음', t=>{phrase=t; updatePreview();});

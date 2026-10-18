@@ -62,7 +62,7 @@ function paperBg(x,W,H,base){ x.drawImage(paperCanvas(W,H,base),0,0); }
 function printOn(x,W,H,[rx,ry,rw,rh]){ // 사진 위에 종이 질감을 곱한다 — 종이에 인화된 것처럼 알갱이가 비친다 (항상 흰 바탕 기준)
   x.save(); x.globalCompositeOperation='multiply'; x.globalAlpha=.55; x.drawImage(paperCanvas(W,H,'#ffffff'),rx,ry,rw,rh,rx,ry,rw,rh); x.restore();
 }
-function seal(x,im,{cx,cy,w,deg,blend='multiply'}){ // 도장 — 흰 종이엔 multiply로 스민 느낌, 회색 종이엔 그냥 올린다(곱하면 검붉어짐)
+function seal(x,im,{cx,cy,w,deg,blend='multiply'}){ // 도장 — 흰 종이엔 multiply로 스민 느낌, 색 종이엔 그냥 올린다(곱하면 죽는다)
   const h=w*im.naturalHeight/im.naturalWidth;
   x.save(); x.translate(cx,cy); x.rotate(deg*Math.PI/180); x.globalAlpha=.94; x.globalCompositeOperation=blend;
   x.drawImage(im,-w/2,-h/2,w,h); x.restore();
@@ -100,18 +100,18 @@ export default {
             cha:'assets/cha.png',   kim:'assets/kim.png',   pd:'assets/pd.png',      // 일러스트
             pcha:'assets/pcha.webp', pkim:'assets/pkim.webp', ppd:'assets/ppd.webp', pgan:'assets/pgan.webp', // 실사 누끼
             mcha:'assets/mcha.webp', mkim:'assets/mkim.webp', mpd:'assets/mpd.webp',  mgan:'assets/mgan.webp', // 같은 사진, 눈 모자이크
-            stamp:'assets/stamp.png', stamp2:'assets/stamp2.png' },                      // 심의필 / 심의미필 도장
+            stamp:'assets/stamp.png', stamp2:'assets/stamp2.png', stamp2w:'assets/stamp2w.png' }, // 심의필 / 심의미필 도장 / 흰 심의미필 도장(빨간 종이용)
   filters: [
     {id:'original', name:'오리지널', css:'none'},
     {id:'tone',     name:'스크린톤', css:'grayscale(1) contrast(1.18)'},
   ],
-  frames: [ // layout: 캔버스·컷 배치 / cast: 어떤 출연자 그림을 세울지. name은 칩에 한 줄로 들어간다
-    {id:'wide-i', name:'일러스트 와이드 버-전',            layout:'wide', cast:'illust',     bg:'#0a0a0a', txt:RED},
-    {id:'tall-i', name:'일러스트 세로 버-전',              layout:'tall', cast:'illust',     bg:'#0a0a0a', txt:RED},
-    {id:'tall-p', name:'심의필 버-전',                     layout:'tall', cast:'photo',      paper:true, bg:'#f7f6f2', txt:RED}, // paper: 꽃 대신 흰 종이 + 도장
-    {id:'tall-g', name:'심의필 스페-샬 게스트 버-전',   layout:'tall', cast:'photoGuest', paper:true, bg:'#f7f6f2', txt:RED}, // 4컷에 김간지
-    {id:'tall-g2',name:'심의미필 스페-샬 게스트 버-전', layout:'tall', cast:'photoGuestM', paper:true, paperColor:'#787878', bg:'#787878', txt:RED,
-     stamp:{key:'stamp2', w:860, cx:600, blend:'source-over'}}, // 회색 종이(누끼 확인용으로 쓰던 그 회색) + 눈 모자이크 + 심의미필 도장
+  frames: [ // layout: 캔버스·컷 배치 / cast: 어떤 출연자 그림을 세울지. 칩은 name(계열) 아래 sub(버전)를 작게 한 줄로. color는 계열 색
+    {id:'wide-i', name:'일러스트', sub:'와이드 버-전',        layout:'wide', cast:'illust',     bg:'#0a0a0a', txt:RED},
+    {id:'tall-i', name:'일러스트', sub:'세로 버-전',          layout:'tall', cast:'illust',     bg:'#0a0a0a', txt:RED},
+    {id:'tall-p', name:'심의필',   sub:'오리지날-버-전',      layout:'tall', cast:'photo',      paper:true, bg:'#f7f6f2', txt:RED, color:RED}, // paper: 꽃 대신 흰 종이 + 도장
+    {id:'tall-g', name:'심의필',   sub:'스페-샬 게스트 버-전', layout:'tall', cast:'photoGuest', paper:true, bg:'#f7f6f2', txt:RED, color:RED}, // 4컷에 김간지
+    {id:'tall-g2',name:'심의미필', sub:'스페-샬 게스트 버-전', layout:'tall', cast:'photoGuestM', paper:true, paperColor:RED, bg:RED, txt:'#fff', color:'#787878',
+     stamp:{key:'stamp2w', w:860, cx:600, blend:'source-over'}}, // 빨간 종이 + 눈 모자이크 + 흰 심의미필 도장. 칩은 회색(검정·빨강과 구분)
   ],
 
   // 스트립 전체를 그린다 — 캔버스 크기·배경·컷·출연자·테두리
