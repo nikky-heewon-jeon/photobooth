@@ -53,6 +53,7 @@ body[data-filter="tone"] .guide{
     radial-gradient(circle, rgba(8,8,8,.55) 1px, transparent 1.45px) 2px 2px / 4px 4px;
 }
 
-/* 프레임 칩 — 한 줄 이름, 작은 글씨, 두 개씩 한 줄(마지막은 혼자 가로로 꽉 참). 줄 간격 12 */
-#frames{ gap:12px }
-#frames .chip{ flex:1 1 45%; font-size:13px; line-height:1.3; padding:13px 8px; white-space:nowrap }
+/* 프레임 칩 — 한 줄 이름, 두 개씩 한 줄(마지막은 혼자 가로로 꽉 참). 줄 간격 15.
+   글씨는 칩 폭에 맞춰 줄어든다(최대 13px) — 어떤 폭에서도 절대 두 줄이 되지 않게 */
+#frames{ gap:15px; container-type:inline-size }
+#frames .chip{ flex:1 1 45%; font-size:min(13px, 2.5cqw); line-height:1.3; padding:13px 6px; white-space:nowrap; overflow:hidden }

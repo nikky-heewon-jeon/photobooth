@@ -47,10 +47,10 @@ function tone(x){ // 망점 — 6px 타일 한 번 만들어 재사용
   return _tone=x.createPattern(c,'repeat');
 }
 const _paper={};
-function paperCanvas(W,H){ // 흰 종이 질감 — 알갱이 + 섬유결 + 옅은 얼룩. 누렇게는 안 한다. 크기별로 한 번만 그려 캐시
-  const k=W+'x'+H; if(!_paper[k]){ const c=document.createElement('canvas'); c.width=W; c.height=H; const q=c.getContext('2d');
+function paperCanvas(W,H,base='#fcfbf9'){ // 종이 질감 — 알갱이 + 섬유결 + 옅은 얼룩. base는 종이 색. 크기·색별로 한 번만 그려 캐시
+  const k=W+'x'+H+base; if(!_paper[k]){ const c=document.createElement('canvas'); c.width=W; c.height=H; const q=c.getContext('2d');
     let s=1234; const rnd=()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; };
-    q.fillStyle='#fcfbf9'; q.fillRect(0,0,W,H); // 더 흰 종이
+    q.fillStyle=base; q.fillRect(0,0,W,H);
     for(let i=0;i<7;i++){ const px=rnd()*W,py=rnd()*H,r=200+rnd()*320; const g=q.createRadialGradient(px,py,0,px,py,r); g.addColorStop(0,'rgba(60,60,60,.045)'); g.addColorStop(1,'rgba(60,60,60,0)'); q.fillStyle=g; q.fillRect(px-r,py-r,r*2,r*2); } // 톤 얼룩
     q.strokeStyle='rgba(70,70,70,.15)'; q.lineWidth=1;
     for(let i=0;i<Math.round(W*H/1100);i++){ const px=rnd()*W,py=rnd()*H,a=rnd()*Math.PI,l=5+rnd()*16; q.beginPath(); q.moveTo(px,py); q.lineTo(px+Math.cos(a)*l,py+Math.sin(a)*l); q.stroke(); } // 섬유결
@@ -58,13 +58,13 @@ function paperCanvas(W,H){ // 흰 종이 질감 — 알갱이 + 섬유결 + 옅�
     _paper[k]=c; }
   return _paper[k];
 }
-function paperBg(x,W,H){ x.drawImage(paperCanvas(W,H),0,0); }
-function printOn(x,W,H,[rx,ry,rw,rh]){ // 사진 위에 종이 질감을 곱한다 — 종이에 인화된 것처럼 알갱이가 비친다
-  x.save(); x.globalCompositeOperation='multiply'; x.globalAlpha=.55; x.drawImage(paperCanvas(W,H),rx,ry,rw,rh,rx,ry,rw,rh); x.restore();
+function paperBg(x,W,H,base){ x.drawImage(paperCanvas(W,H,base),0,0); }
+function printOn(x,W,H,[rx,ry,rw,rh]){ // 사진 위에 종이 질감을 곱한다 — 종이에 인화된 것처럼 알갱이가 비친다 (항상 흰 바탕 기준)
+  x.save(); x.globalCompositeOperation='multiply'; x.globalAlpha=.55; x.drawImage(paperCanvas(W,H,'#ffffff'),rx,ry,rw,rh,rx,ry,rw,rh); x.restore();
 }
-function seal(x,im,{cx,cy,w,deg}){ // 도장 — multiply로 종이에 스민 느낌
+function seal(x,im,{cx,cy,w,deg,blend='multiply'}){ // 도장 — 흰 종이엔 multiply로 스민 느낌, 회색 종이엔 그냥 올린다(곱하면 검붉어짐)
   const h=w*im.naturalHeight/im.naturalWidth;
-  x.save(); x.translate(cx,cy); x.rotate(deg*Math.PI/180); x.globalAlpha=.94; x.globalCompositeOperation='multiply';
+  x.save(); x.translate(cx,cy); x.rotate(deg*Math.PI/180); x.globalAlpha=.94; x.globalCompositeOperation=blend;
   x.drawImage(im,-w/2,-h/2,w,h); x.restore();
 }
 function cover(x,img,dx,dy,dw,dh){ // 비율 유지하고 가운데를 채운다
@@ -110,8 +110,8 @@ export default {
     {id:'tall-i', name:'일러스트 세로 버-전',              layout:'tall', cast:'illust',     bg:'#0a0a0a', txt:RED},
     {id:'tall-p', name:'심의필 버-전',                     layout:'tall', cast:'photo',      paper:true, bg:'#f7f6f2', txt:RED}, // paper: 꽃 대신 흰 종이 + 도장
     {id:'tall-g', name:'심의필 스페-샬 게스트 버-전',   layout:'tall', cast:'photoGuest', paper:true, bg:'#f7f6f2', txt:RED}, // 4컷에 김간지
-    {id:'tall-g2',name:'심의미필 스페-샬 게스트 버-전', layout:'tall', cast:'photoGuestM', paper:true, bg:'#f7f6f2', txt:RED,
-     stamp:{key:'stamp2', w:860, cx:600}}, // 눈 모자이크 + 심의미필 도장(가로가 길어 폭·중심을 따로 준다)
+    {id:'tall-g2',name:'심의미필 스페-샬 게스트 버-전', layout:'tall', cast:'photoGuestM', paper:true, paperColor:'#787878', bg:'#787878', txt:RED,
+     stamp:{key:'stamp2', w:860, cx:600, blend:'source-over'}}, // 회색 종이(누끼 확인용으로 쓰던 그 회색) + 눈 모자이크 + 심의미필 도장
   ],
 
   // 스트립 전체를 그린다 — 캔버스 크기·배경·컷·출연자·테두리
@@ -120,7 +120,7 @@ export default {
     if(!ready(fr)){ cv.width=9; cv.height=16; return; } // 프레임 이미지 로딩 전
     const L=LAYOUT[g.frame.paper?'paper':'floral'][g.frame.layout], plan=PLAN[g.frame.cast][g.frame.layout];
     cv.width=L.W; cv.height=L.H; const x=cv.getContext('2d'); x.imageSmoothingQuality='high';
-    if(g.frame.paper) paperBg(x,L.W,L.H); else if(g.frame.layout==='wide') x.drawImage(fr,0,0); else tallBg(x,fr);
+    if(g.frame.paper) paperBg(x,L.W,L.H,g.frame.paperColor); else if(g.frame.layout==='wide') x.drawImage(fr,0,0); else tallBg(x,fr);
     L.rects.forEach((r,i)=>{
       const s=shots[i];
       if(s) cover(x,s,...r); else { x.fillStyle='#bdbdbd'; x.fillRect(...r); }
