@@ -133,6 +133,8 @@ catch(e){ themeErr=true; T=(await import('./themes/base/theme.js')).default; }
 if(T.css) document.head.insertAdjacentHTML('beforeend',`<link rel="stylesheet" href="${asset(T.css)}">`);
 document.title=T.name;
 document.querySelectorAll('.mark').forEach(el=>el.textContent=T.name);
+const IMG={}; // 테마가 선언한 이미지를 미리 띄워둔다. draw()에서 g.img.<키>로 쓴다
+for(const [k,path] of Object.entries(T.images||{})){ const i=new Image(); i.src=asset(path); IMG[k]=i; }
 if(themeErr) document.querySelector('#capScreen .tag').textContent=`'${THEME_ID}' 테마를 못 찾아 기본 테마로 엽니다`;
 
 let filter=FILTERS[0], frame=T.frames[0], phrase=T.phrases[0], shots=[];
@@ -228,7 +230,8 @@ async function makeQR(pending){
 function letterSpace(s,n){ return s.split('').join(' '.repeat(n)); }
 
 function compose(cv=$('strip'), list=shots){
-  const W=PW+PAD*2, H=PAD+SHOTS*PH+(SHOTS-1)*GAP+FOOT;
+  const foot=T.foot||FOOT; // 테마가 하단 높이를 키울 수 있다(로고 등)
+  const W=PW+PAD*2, H=PAD+SHOTS*PH+(SHOTS-1)*GAP+foot;
   cv.width=W*DPR; cv.height=H*DPR;
   const x=cv.getContext('2d'); x.scale(DPR,DPR);
   x.fillStyle=frame.bg; x.fillRect(0,0,W,H);
@@ -236,8 +239,12 @@ function compose(cv=$('strip'), list=shots){
   const baseY=PAD+SHOTS*PH+(SHOTS-1)*GAP;
   const date=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\.$/,'');
   x.fillStyle=frame.txt; x.textAlign='center';
-  if(phrase){ x.font='600 17px Pretendard,sans-serif'; x.fillText(letterSpace(phrase,1), W/2, baseY+36); }
-  x.globalAlpha=.6; x.font='400 12px Pretendard,sans-serif'; x.fillText(letterSpace(date,1), W/2, baseY+58); x.globalAlpha=1;
+  // 하단(사진 아래)은 테마가 draw()로 통째로 가져간다. 없으면 기본 문구+날짜.
+  if(T.draw) T.draw(x, {W,H,baseY,PAD,PW,PH,GAP,SHOTS,frame,phrase,date,img:IMG,letterSpace});
+  else{
+    if(phrase){ x.font='600 17px Pretendard,sans-serif'; x.fillText(letterSpace(phrase,1), W/2, baseY+36); }
+    x.globalAlpha=.6; x.font='400 12px Pretendard,sans-serif'; x.fillText(letterSpace(date,1), W/2, baseY+58); x.globalAlpha=1;
+  }
 }
 
 function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id===id)); window.scrollTo(0,0); }
