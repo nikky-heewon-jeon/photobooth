@@ -26,13 +26,14 @@ const PLAN={
           {img:'kim',side:'C',scale:0.95,down:.14},
           {img:'pd', side:'L',scale:0.94,down:.12}, null],
   },
-  photo:{  // 전신 실사 — 일러스트처럼 상반신만 보이게 키우고, 하트 손이 가운데 오게. 1~3컷 팬은 오른쪽, 4컷(김간지)은 왼쪽 (세로만 씀)
+  photo:{  // 전신 실사 — 일러스트처럼 상반신만 보이게 키우고, 하트 손이 가운데 오게. 팬은 오른쪽 (세로만 씀)
     tall:[{img:'pcha',side:'L',scale:1.9,down:.06,anchor:'top',shift:-.02},  // 하트 손이 컷 가운데 오게 왼쪽으로 — 몸 왼쪽은 잘림
           {img:'pkim',side:'L',scale:1.9,down:.06,anchor:'top',shift:+.08},  // 손(하트)이 컷 가운데
-          {img:'ppd', side:'L',scale:1.9,down:.10,anchor:'top',shift:0},        // 왼쪽 절반을 차지 — 하트의 왼쪽 반, 팬이 오른쪽 반
-          {img:'pgan',side:'R',scale:1.9,down:.06,anchor:'top'}],                // 김간지: 오른쪽 끝, 팬은 왼쪽
+          {img:'ppd', side:'L',scale:1.9,down:.10,anchor:'top',shift:0}, null], // 왼쪽 절반을 차지 — 하트의 왼쪽 반, 팬이 오른쪽 반
   },
 };
+// 스페셜 게스트 버전 — 1~3컷은 같고, 4컷에 김간지(오른쪽 끝, 팬은 왼쪽)
+PLAN.photoGuest={ tall:[...PLAN.photo.tall.slice(0,3), {img:'pgan',side:'R',scale:1.9,down:.06,anchor:'top'}] };
 
 const ready=im=>im&&im.complete&&im.naturalWidth>0;
 let _tone=null;
@@ -105,6 +106,7 @@ export default {
     {id:'wide-i', name:'와이드 일러스트', layout:'wide', cast:'illust', bg:'#0a0a0a', txt:RED},
     {id:'tall-i', name:'세로 일러스트',   layout:'tall', cast:'illust', bg:'#0a0a0a', txt:RED},
     {id:'tall-p', name:'세로 실사',       layout:'tall', cast:'photo',  paper:true, bg:'#f7f6f2', txt:RED}, // paper: 꽃 대신 흰 종이 + 도장
+    {id:'tall-g', name:'세로 실사 · 스페셜 게스트', layout:'tall', cast:'photoGuest', paper:true, bg:'#f7f6f2', txt:RED}, // 4컷에 김간지
   ],
 
   // 스트립 전체를 그린다 — 캔버스 크기·배경·컷·출연자·테두리
