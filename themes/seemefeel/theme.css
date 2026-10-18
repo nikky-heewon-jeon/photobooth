@@ -52,3 +52,7 @@ body[data-filter="tone"] .guide{
     radial-gradient(circle, rgba(8,8,8,.55) 1px, transparent 1.45px) 0 0 / 4px 4px,
     radial-gradient(circle, rgba(8,8,8,.55) 1px, transparent 1.45px) 2px 2px / 4px 4px;
 }
+
+/* 프레임 칩 — 두 줄 이름. 5개라 3+2로 배치, 둘째 줄 작은 글씨 */
+#frames .chip{ flex:1 1 30%; line-height:1.35; padding:12px 8px }
+#frames .chip small{ display:block; font-size:.78em; margin-top:2px; opacity:.85 }

@@ -102,11 +102,12 @@ export default {
     {id:'original', name:'오리지널', css:'none'},
     {id:'tone',     name:'스크린톤', css:'grayscale(1) contrast(1.18)'},
   ],
-  frames: [ // layout: 캔버스·컷 배치 / cast: 어떤 출연자 그림을 세울지
-    {id:'wide-i', name:'와이드 일러스트', layout:'wide', cast:'illust', bg:'#0a0a0a', txt:RED},
-    {id:'tall-i', name:'세로 일러스트',   layout:'tall', cast:'illust', bg:'#0a0a0a', txt:RED},
-    {id:'tall-p', name:'세로 실사',       layout:'tall', cast:'photo',  paper:true, bg:'#f7f6f2', txt:RED}, // paper: 꽃 대신 흰 종이 + 도장
-    {id:'tall-g', name:'세로 실사 · 스페셜 게스트', layout:'tall', cast:'photoGuest', paper:true, bg:'#f7f6f2', txt:RED}, // 4컷에 김간지
+  frames: [ // layout: 캔버스·컷 배치 / cast: 어떤 출연자 그림을 세울지. name은 칩에 HTML로 들어간다(줄바꿈·작은 글씨)
+    {id:'wide-i', name:'일러스트<br>와이드 버-전',            layout:'wide', cast:'illust',     bg:'#0a0a0a', txt:RED},
+    {id:'tall-i', name:'일러스트<br>세로 버-전',              layout:'tall', cast:'illust',     bg:'#0a0a0a', txt:RED},
+    {id:'tall-p', name:'심의필<br>버-전',                     layout:'tall', cast:'photo',      paper:true, bg:'#f7f6f2', txt:RED}, // paper: 꽃 대신 흰 종이 + 도장
+    {id:'tall-g', name:'심의필<br><small>스페-샬 게스트</small>',   layout:'tall', cast:'photoGuest', paper:true, bg:'#f7f6f2', txt:RED}, // 4컷에 김간지
+    {id:'tall-g2',name:'심의미필<br><small>스페-샬 게스트</small>', layout:'tall', cast:'photoGuest', paper:true, bg:'#f7f6f2', txt:RED}, // TODO: 4번과 무엇이 다른지 확인 필요 — 지금은 동일
   ],
 
   // 스트립 전체를 그린다 — 캔버스 크기·배경·컷·출연자·테두리
