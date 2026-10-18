@@ -22,10 +22,10 @@ const PLAN={
           {img:'pd', side:'L',scale:0.94,down:.12}, null],
   },
   photo:{  // 전신 실사 — 일러스트처럼 상반신만 보이게 키우고, 셋 다 같은 자리(왼쪽에서 11%)에. 팬은 오른쪽
-    wide:[{img:'pcha',side:'L',scale:3.0,down:-.02,anchor:'top',shift:+.08},
+    wide:[{img:'pcha',side:'L',scale:3.0,down:-.02,anchor:'top',shift:-.02},
           {img:'pkim',side:'L',scale:3.0,down:-.02,anchor:'top',shift:+.08},
           {img:'ppd', side:'L',scale:3.0,down:-.35,anchor:'top',shift:+.08}, null], // 김은하: 팔은 컷 위로
-    tall:[{img:'pcha',side:'L',scale:1.9,down:.06,anchor:'top',shift:+.08},  // 머리 위 6%, 허리에서 잘림
+    tall:[{img:'pcha',side:'L',scale:1.9,down:.06,anchor:'top',shift:-.02},  // 하트 손이 컷 가운데 오게 왼쪽으로 — 몸 왼쪽은 잘림
           {img:'pkim',side:'L',scale:1.9,down:.06,anchor:'top',shift:+.08},  // 손(하트)이 컷 가운데
           {img:'ppd', side:'L',scale:1.9,down:-.17,anchor:'top',shift:+.08}, null], // 팔이 위라 머리 높이를 둘과 맞춘 값
   },
