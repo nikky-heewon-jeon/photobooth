@@ -28,7 +28,7 @@ const PLAN={
   },
   photo:{  // 전신 실사 — 일러스트처럼 상반신만 보이게 키우고, 하트 손이 가운데 오게. 팬은 오른쪽 (세로만 씀)
     tall:[{img:'pcha',side:'L',scale:1.9,down:.06,anchor:'top',shift:-.02},  // 하트 손이 컷 가운데 오게 왼쪽으로 — 몸 왼쪽은 잘림
-          {img:'pkim',side:'L',scale:1.9,down:.24,anchor:'top',shift:+.08},  // 손(하트)이 컷 가운데. 새 누끼에 맞춰 조금 내림
+          {img:'pkim',side:'L',scale:1.9,down:.19,anchor:'top',shift:+.08},  // 손(하트)이 컷 가운데. 새 누끼에 맞춰 조금 내림
           {img:'ppd', side:'L',scale:1.9,down:.10,anchor:'top',shift:0}, null], // 왼쪽 절반을 차지 — 하트의 왼쪽 반, 팬이 오른쪽 반
   },
 };
