@@ -45,3 +45,10 @@ header{ width:100%; margin-bottom:32px } /* 로고 아래 여백을 위(.screen 
 .chip{ border-width:2px; color:var(--fg) }
 .chip[aria-pressed="true"]{ color:#fff }
 .btn-ghost{ border-width:2px }
+
+/* 스크린톤을 고르면 라이브뷰에도 망점 — 가이드 레이어 배경으로 얹는다(카운트다운 숫자 아래, 영상 위) */
+body[data-filter="tone"] .guide{
+  background:
+    radial-gradient(circle, rgba(8,8,8,.55) 1px, transparent 1.45px) 0 0 / 4px 4px,
+    radial-gradient(circle, rgba(8,8,8,.55) 1px, transparent 1.45px) 2px 2px / 4px 4px;
+}

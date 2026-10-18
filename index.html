@@ -177,7 +177,8 @@ function chips(host, list, render, onPick){
     host.appendChild(b);
   });
 }
-chips($('filters'), FX, t=>t.name, t=>{filter=t; video.style.filter=t.css; updatePreview();});
+chips($('filters'), FX, t=>t.name, t=>{filter=t; video.style.filter=t.css; document.body.dataset.filter=t.id; updatePreview();});
+document.body.dataset.filter=filter.id; // 테마 CSS가 필터별로 라이브뷰 위에 효과를 얹을 수 있게
 // 프레임이 하나뿐인 테마는 FRAME 칸도 숨긴다(고를 게 없는 칩 한 개를 안 보이게)
 if(T.frames.length>1) chips($('frames'), T.frames, t=>t.name, t=>{frame=t; updatePreview(); drawGuide(0);});
 else{ const r=$('frames'); r.previousElementSibling.remove(); r.remove(); }
