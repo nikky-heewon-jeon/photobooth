@@ -10,11 +10,10 @@ const WIDE=(()=>{ const L=90,R=F.w-90,top=84,bot=1330,gap=22,w=R-L,h=Math.floor(
 // 세로 스트립 — 꽃 지면을 거울 반복해 늘리고 로고 밴드를 바닥에 고정, 3:2 4컷
 const TALL=(()=>{ const pad=56,gap=28,w=F.fx1-F.fx0-pad*2,h=Math.round(w/1.5),bodyH=pad+4*h+3*gap+pad;
   return {W:F.w, H:F.fy0+bodyH+(F.h-F.floral1), bodyH, rects:[0,1,2,3].map(i=>[F.fx0+pad,F.fy0+pad+i*(h+gap),w,h])}; })();
-// 흰 종이 프레임(실사용) — 같은 컷 배치에 바탕만 종이, 하단에 도장 하나를 사선으로
-const PTALL=(()=>{ const r=TALL.rects.map(([x,y,w,h])=>[x,y,w,h]); const last=r[3];
-  return {W:F.w, H:last[1]+last[3]+300, rects:r, stamp:{cx:F.w/2+90, cy:last[1]+last[3]+20, w:760, deg:-15}}; })();
-const PWIDE={W:F.w, H:F.h, rects:WIDE.rects, stamp:{cx:F.w/2, cy:1620, w:560, deg:-7}};
-const LAYOUT={ floral:{wide:WIDE, tall:TALL}, paper:{wide:PWIDE, tall:PTALL} };
+// 흰 종이 프레임(실사용) — 여백을 최소로, 컷이 폭을 거의 다 차지. 하단에 도장 하나가 4컷 아래를 물고 사선으로
+const PTALL=(()=>{ const pad=40,gap=20,w=F.w-pad*2,h=Math.round(w/1.5); const r=[0,1,2,3].map(i=>[pad,pad+i*(h+gap),w,h]); const last=r[3];
+  return {W:F.w, H:last[1]+last[3]+280, rects:r, stamp:{cx:F.w/2+90, cy:last[1]+last[3]+20, w:760, deg:-15}}; })();
+const LAYOUT={ floral:{wide:WIDE, tall:TALL}, paper:{tall:PTALL} };
 
 // 컷별 출연자 배치 — side 설 자리 · scale 컷 높이 대비 · down 아래로 내림(음수면 위로) · anchor 기준변. 4컷은 팬만.
 // 팬은 출연자가 몸을 기울이거나 손짓하는 쪽(비어 있는 쪽)에 선다.
@@ -27,10 +26,7 @@ const PLAN={
           {img:'kim',side:'C',scale:0.95,down:.14},
           {img:'pd', side:'L',scale:0.94,down:.12}, null],
   },
-  photo:{  // 전신 실사 — 일러스트처럼 상반신만 보이게 키우고, 셋 다 같은 자리(왼쪽에서 11%)에. 팬은 오른쪽
-    wide:[{img:'pcha',side:'L',scale:3.0,down:-.02,anchor:'top',shift:+.10},  // 하트 손(그림 폭 92%)이 컷 가운데
-          {img:'pkim',side:'L',scale:3.0,down:-.02,anchor:'top',shift:+.17},  // 하트 손이 컷 가운데
-          {img:'ppd', side:'L',scale:3.0,down:.06,anchor:'top',shift:+.10}, null], // 김은하: 오른쪽 변이 컷 49% — 왼쪽 절반
+  photo:{  // 전신 실사 — 일러스트처럼 상반신만 보이게 키우고, 하트 손이 가운데 오게. 팬은 오른쪽 (세로만 씀)
     tall:[{img:'pcha',side:'L',scale:1.9,down:.06,anchor:'top',shift:-.02},  // 하트 손이 컷 가운데 오게 왼쪽으로 — 몸 왼쪽은 잘림
           {img:'pkim',side:'L',scale:1.9,down:.06,anchor:'top',shift:+.08},  // 손(하트)이 컷 가운데
           {img:'ppd', side:'L',scale:1.9,down:.10,anchor:'top',shift:0}, null], // 왼쪽 절반을 차지 — 하트의 왼쪽 반, 팬이 오른쪽 반
@@ -99,8 +95,7 @@ export default {
   frames: [ // layout: 캔버스·컷 배치 / cast: 어떤 출연자 그림을 세울지
     {id:'wide-i', name:'와이드 일러스트', layout:'wide', cast:'illust', bg:'#0a0a0a', txt:RED},
     {id:'tall-i', name:'세로 일러스트',   layout:'tall', cast:'illust', bg:'#0a0a0a', txt:RED},
-    {id:'wide-p', name:'와이드 실사',     layout:'wide', cast:'photo',  paper:true, bg:'#f7f6f2', txt:RED}, // paper: 꽃 대신 흰 종이 + 도장
-    {id:'tall-p', name:'세로 실사',       layout:'tall', cast:'photo',  paper:true, bg:'#f7f6f2', txt:RED},
+    {id:'tall-p', name:'세로 실사',       layout:'tall', cast:'photo',  paper:true, bg:'#f7f6f2', txt:RED}, // paper: 꽃 대신 흰 종이 + 도장
   ],
 
   // 스트립 전체를 그린다 — 캔버스 크기·배경·컷·출연자·테두리
