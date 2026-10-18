@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>포토부스</title>
+<style>
+  :root{
+    --bg:#fff; --card:#fff; --fg:#000; --dim:#6b6b6b;
+    --line:#000; --accent:#f4f4f2; --primary:#000;
+    --r-xl:0px; --r-lg:0px; --r-md:0px; --r-sm:0px;
+    --dur:200ms; --ease:cubic-bezier(0.22,1,0.36,1);
+    --shadow:none;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--fg);
+    font-family:Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    -webkit-user-select:none; user-select:none;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  .screen{min-height:100%; display:none; flex-direction:column; align-items:center;
+    justify-content:flex-start; gap:18px; padding:32px 24px 40px; overflow-y:auto}
+  .screen.on{display:flex}
+
+  header{text-align:center}
+  .mark{font-size:34px; letter-spacing:.04em; font-weight:800; color:var(--fg)}
+  .tag{font-size:13px; color:var(--dim); margin-top:8px}
+
+  .panel{width:100%; max-width:560px; background:var(--card); border:1px solid var(--line);
+    border-radius:var(--r-xl); box-shadow:var(--shadow); padding:20px; display:flex; flex-direction:column}
+
+  .stage{position:relative; width:100%; aspect-ratio:3/2; border-radius:var(--r-lg); overflow:hidden;
+    background:#000; border:1px solid var(--line)}
+  video{width:100%; height:100%; object-fit:cover; transform:scaleX(-1)}
+  .count{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-size:140px; font-weight:700; color:#fff; text-shadow:0 4px 40px rgba(0,0,0,.7);
+    background:rgba(0,0,0,.2); pointer-events:none}
+  .progress{position:absolute; top:14px; left:14px; font-size:14px; letter-spacing:.25em;
+    color:#fff; background:rgba(0,0,0,.55); padding:6px 13px; display:none}
+  .flash{position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none}
+  .flash.on{animation:flash 340ms var(--ease)}
+  @keyframes flash{0%{opacity:.95}100%{opacity:0}}
+
+  .lab{font-size:12px; letter-spacing:.02em; color:var(--dim); margin:22px 0 11px; font-weight:500}
+  .row{display:flex; gap:9px; flex-wrap:wrap}
+  .chip{flex:1 1 0; min-width:80px; background:var(--accent); border:1px solid var(--line); color:var(--dim);
+    border-radius:var(--r-md); padding:14px 8px; font-size:15px; cursor:pointer; text-align:center; font-weight:500;
+    transition:color var(--dur) var(--ease), background var(--dur) var(--ease), border-color var(--dur) var(--ease)}
+  .chip[aria-pressed="true"]{color:#fff; background:var(--fg); border-color:var(--fg)}
+
+  .btn{width:100%; max-width:560px; padding:18px; border:none; border-radius:var(--r-md); font-size:17px; font-weight:600;
+    font-family:inherit; cursor:pointer; letter-spacing:.02em; transition:opacity var(--dur) var(--ease)}
+  .btn-go{background:var(--primary); color:#fff}
+  .btn-go.full{margin-top:18px}
+  .btn-ghost{background:var(--card); color:var(--fg); border:1px solid var(--line); margin-top:10px}
+  .btn:disabled{opacity:.45}
+  .chip:focus-visible,.btn:focus-visible{outline:none; box-shadow:0 0 0 3px rgba(0,0,0,.12)}
+
+  .preview-wrap{display:flex; justify-content:center; margin-top:4px}
+  #preview{height:300px; max-width:100%; border:1px solid var(--line); background:var(--accent)}
+
+  .result-body{flex:1; display:flex; align-items:center; justify-content:center; padding:4px 0; width:100%}
+  #strip{max-width:100%; max-height:60vh; border:1px solid var(--line)}
+
+  .qrbox{display:flex; flex-direction:column; align-items:center; gap:8px; min-height:26px}
+  #qrimg{display:none}
+  #qrimg svg{width:170px; height:auto; display:block}
+  .qrcap{font-size:13px; color:var(--dim); text-align:center}
+
+  .err{color:var(--dim); font-size:14px; text-align:center; line-height:1.7; padding:30px}
+  @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important; transition:none!important}}
+</style>
+</head>
+<body>
+
+<section class="screen on" id="capScreen">
+  <header><div class="mark">PHOTO BOOTH</div><div class="tag">테마를 고르면 4컷을 자동으로 찍어드려요</div></header>
+  <div class="panel">
+    <div class="stage">
+      <video id="cam" autoplay playsinline muted></video>
+      <div class="flash" id="flash"></div>
+      <div class="progress" id="prog"></div>
+      <div class="count" id="count" style="display:none"></div>
+    </div>
+    <div class="err" id="err" style="display:none"></div>
+
+    <p class="lab">필터</p>
+    <div class="row" id="filters"></div>
+    <p class="lab">프레임</p>
+    <div class="row" id="frames"></div>
+
+    <p class="lab">문구</p>
+    <div class="row" id="phrases"></div>
+
+    <p class="lab">미리보기</p>
+    <div class="preview-wrap"><canvas id="preview"></canvas></div>
+  </div>
+  <button class="btn btn-go full" id="shoot">START</button>
+</section>
+
+<section class="screen" id="resScreen">
+  <header><div class="mark">PHOTO BOOTH</div><div class="tag">QR을 찍어 가져가거나 아래로 저장하세요</div></header>
+  <div class="result-body"><canvas id="strip"></canvas></div>
+  <div class="qrbox" id="qrbox"><div id="qrimg"></div><div class="qrcap" id="qrcap"></div></div>
+  <button class="btn btn-go full" id="download">SAVE · PNG 저장</button>
+  <button class="btn btn-ghost" id="retake">다시 찍기</button>
+</section>
+
+<script src="assets/qrcode.js"></script>
+<script>
+// ── QR 다운로드 설정 (Cloudinary 무서명 업로드) ──────────────
+// 둘 중 하나라도 비우면 QR 대신 안내만 뜨고, SAVE(로컬 저장)는 항상 동작.
+const CLOUD_NAME='disdmlod';   // Cloudinary Cloud name
+const UPLOAD_PRESET='jebs-pb'; // Unsigned upload preset — 행사별로 새로 만들면 폴더가 분리됨
+
+const FILTERS=[
+  {id:'original', name:'오리지널', css:'none'},
+  {id:'mono',     name:'흑백',     css:'grayscale(1) contrast(1.08)'},
+  {id:'haduri',   name:'하두리',   css:'brightness(1.35) contrast(0.8) saturate(1.12) blur(0.5px)', lo:0.42},
+];
+const FRAMES=[
+  {id:'white', name:'화이트', bg:'#f7f7f4', txt:'#111'},
+  {id:'black', name:'블랙',   bg:'#101010', txt:'#f4f4f4'},
+];
+const PHRASES=['','오늘 좋았다','또 보자'];
+const SHOTS=4, PW=400, PH=267, PAD=24, GAP=14, FOOT=82, DPR=3;
+let filter=FILTERS[0], frame=FRAMES[0], phrase=PHRASES[0], shots=[];
+
+const $=id=>document.getElementById(id);
+const video=$('cam'), flash=$('flash'), count=$('count'), prog=$('prog');
+
+function chips(host, list, render, onPick){
+  list.forEach((t,i)=>{
+    const b=document.createElement('button');
+    b.className='chip'; b.setAttribute('aria-pressed', i===0); b.innerHTML=render(t);
+    b.onclick=()=>{ onPick(t); [...host.children].forEach((c,j)=>c.setAttribute('aria-pressed', j===i)); };
+    host.appendChild(b);
+  });
+}
+chips($('filters'), FILTERS, t=>t.name, t=>{filter=t; video.style.filter=t.css; updatePreview();});
+chips($('frames'), FRAMES, t=>t.name, t=>{frame=t; updatePreview();});
+chips($('phrases'), PHRASES, t=>t||'없음', t=>{phrase=t; updatePreview();});
+
+(async()=>{
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:1920},height:{ideal:1080}},audio:false});
+    video.srcObject=stream;
+  }catch(e){
+    $('err').style.display='block'; $('err').innerHTML='카메라 권한이 필요해요.<br>iPad 설정 > Safari > 카메라에서 허용해 주세요.';
+    $('shoot').disabled=true;
+  }
+})();
+
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+
+function drawCover(ctx,dw,dh){
+  const vw=video.videoWidth, vh=video.videoHeight;
+  const s=Math.max(dw/vw,dh/vh), sw=dw/s, sh=dh/s, sx=(vw-sw)/2, sy=(vh-sh)/2;
+  ctx.save(); ctx.translate(dw,0); ctx.scale(-1,1);
+  ctx.imageSmoothingQuality='high';
+  ctx.filter=filter.css==='none'?'none':filter.css;
+  ctx.drawImage(video, sx,sy,sw,sh, 0,0,dw,dh); ctx.restore();
+}
+function snap(){
+  const lr=filter.lo||1; // 보통은 풀해상도, 하두리만 저해상도로 떠서 복고 느낌
+  const cw=Math.round(PW*DPR*lr), ch=Math.round(PH*DPR*lr);
+  const c=document.createElement('canvas'); c.width=cw; c.height=ch;
+  drawCover(c.getContext('2d'), cw, ch); return c;
+}
+
+let busy=false;
+function updatePreview(){
+  if(busy || !video.videoWidth) return;
+  const s=snap();
+  compose($('preview'), Array(SHOTS).fill(s));
+}
+
+async function shoot(){
+  busy=true;
+  $('shoot').disabled=true; shots=[]; prog.style.display='block';
+  let pending=null;
+  for(let i=0;i<SHOTS;i++){
+    prog.textContent=`${i+1} / ${SHOTS}`; count.style.display='flex';
+    for(let n=3;n>0;n--){ count.textContent=n; await wait(800); }
+    count.textContent='●'; await wait(150);
+    flash.classList.remove('on'); void flash.offsetWidth; flash.classList.add('on');
+    shots.push(snap()); count.style.display='none';
+    if(i===SHOTS-1){ compose(); pending=(CLOUD_NAME&&UPLOAD_PRESET)?startUpload():null; } // 마지막 컷 직후 업로드 시작(대기와 겹침)
+    await wait(550);
+  }
+  prog.style.display='none'; $('shoot').disabled=false; busy=false;
+  show('resScreen'); makeQR(pending);
+}
+
+function startUpload(){ // 스트립을 JPEG로 인코딩 후 업로드 → secure_url 반환(진행 중 Promise)
+  return new Promise(r=>$('strip').toBlob(r,'image/jpeg',0.9))
+    .then(blob=>{ const fd=new FormData(); fd.append('file',blob); fd.append('upload_preset',UPLOAD_PRESET);
+      return fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,{method:'POST',body:fd}); })
+    .then(res=>{ if(!res.ok) throw new Error(res.status); return res.json(); })
+    .then(j=>j.secure_url);
+}
+async function makeQR(pending){
+  const img=$('qrimg'), cap=$('qrcap');
+  img.style.display='none';
+  if(!CLOUD_NAME || !UPLOAD_PRESET){ cap.textContent='QR: Cloudinary 설정 후 사용 가능 (SAVE는 지금도 됨)'; return; }
+  cap.textContent='업로드 중…';
+  try{
+    const url=await (pending||startUpload()); // 촬영 중 미리 시작한 업로드가 있으면 그걸 기다림
+    const base=location.href.replace(/[^/]*(\?.*)?$/,''); // 현재 폴더 URL
+    const page=base+'d.html?img='+encodeURIComponent(url);
+    const q=qrcode(0,'M'); q.addData(page); q.make();
+    img.innerHTML=q.createSvgTag({cellSize:7, margin:16, scalable:true});
+    img.style.display='block'; cap.textContent='';
+  }catch(e){ cap.textContent='업로드 실패 · 아래 SAVE로 저장하세요'; }
+}
+
+function letterSpace(s,n){ return s.split('').join(' '.repeat(n)); }
+
+function compose(cv=$('strip'), list=shots){
+  const W=PW+PAD*2, H=PAD+SHOTS*PH+(SHOTS-1)*GAP+FOOT;
+  cv.width=W*DPR; cv.height=H*DPR;
+  const x=cv.getContext('2d'); x.scale(DPR,DPR);
+  x.fillStyle=frame.bg; x.fillRect(0,0,W,H);
+  list.forEach((s,i)=>x.drawImage(s, PAD, PAD+i*(PH+GAP), PW,PH));
+  const baseY=PAD+SHOTS*PH+(SHOTS-1)*GAP;
+  const date=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\.$/,'');
+  x.fillStyle=frame.txt; x.textAlign='center';
+  if(phrase){ x.font='600 17px Pretendard,sans-serif'; x.fillText(letterSpace(phrase,1), W/2, baseY+36); }
+  x.globalAlpha=.6; x.font='400 12px Pretendard,sans-serif'; x.fillText(letterSpace(date,1), W/2, baseY+58); x.globalAlpha=1;
+}
+
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id===id)); window.scrollTo(0,0); }
+
+$('shoot').onclick=shoot;
+$('retake').onclick=()=>show('capScreen');
+setInterval(()=>{ if($('capScreen').classList.contains('on')) updatePreview(); }, 450);
+$('download').onclick=()=>{
+  $('strip').toBlob(b=>{
+    const a=document.createElement('a'); a.href=URL.createObjectURL(b);
+    a.download='photobooth-'+Date.now()+'.png'; a.click(); URL.revokeObjectURL(a.href);
+  },'image/png');
+};
+</script>
+</body>
+</html>

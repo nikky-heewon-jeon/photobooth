@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>사진 저장</title>
+<style>
+  :root{--bg:#fff; --fg:#000; --dim:#6b6b6b; --line:#000; --accent:#f4f4f2; --primary:#000}
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  body{margin:0; min-height:100vh; background:var(--bg); color:var(--fg);
+    font-family:Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    display:flex; flex-direction:column; align-items:center; gap:18px; padding:28px 20px 40px;
+    padding-bottom:calc(40px + env(safe-area-inset-bottom))}
+  #photo{max-width:100%; max-height:68vh; border:1px solid var(--line); background:var(--accent); display:none}
+  .btn{width:100%; max-width:420px; padding:18px; border:none; border-radius:0; font-size:17px; font-weight:600;
+    font-family:inherit; cursor:pointer; letter-spacing:.02em; background:var(--primary); color:#fff}
+  .btn:focus-visible{outline:none; box-shadow:0 0 0 3px rgba(0,0,0,.12)}
+  .err{color:var(--dim); font-size:14px; text-align:center; line-height:1.7; padding:40px}
+</style>
+</head>
+<body>
+  <img id="photo" alt="촬영한 사진" />
+  <button class="btn" id="save" style="display:none">SAVE</button>
+  <div class="err" id="err" style="display:none">이미지 주소가 없어요. QR을 다시 스캔해 주세요.</div>
+<script>
+const img=new URLSearchParams(location.search).get('img');
+const $=id=>document.getElementById(id);
+if(!img){ $('err').style.display='block'; }
+else{
+  const photo=$('photo'), btn=$('save');
+  photo.src=img; photo.style.display='block'; btn.style.display='block';
+  const dl=img.replace('/upload/','/upload/fl_attachment/'); // Cloudinary 강제 다운로드 폴백
+  btn.onclick=async()=>{
+    const label=btn.textContent; btn.textContent='저장 중…';
+    try{
+      const r=await fetch(img); if(!r.ok) throw 0;
+      const b=await r.blob();
+      const a=document.createElement('a'); a.href=URL.createObjectURL(b);
+      a.download='photobooth-'+Date.now()+'.jpg'; document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(a.href); btn.textContent=label;
+    }catch(e){ location.href=dl; } // fetch 실패 시 attachment 링크로
+  };
+}
+</script>
+</body>
+</html>
