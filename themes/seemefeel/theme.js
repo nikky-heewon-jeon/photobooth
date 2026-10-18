@@ -58,7 +58,6 @@ export default {
   name: '심의필',
   slug: 'seemefeel',
   css: 'theme.css',
-  brand: ['assets/illust.jpg'],
   images: { frame:'assets/frame.jpg', cha:'assets/cha.png', kim:'assets/kim.png', pd:'assets/pd.png' },
   filters: [
     {id:'original', name:'오리지널', css:'none'},
