@@ -50,6 +50,8 @@ h1,h2{font-weight:700;letter-spacing:-0.02em}
 .ask .k{color:var(--red);font-size:12px;font-weight:700;letter-spacing:.06em;display:block;margin-bottom:6px}
 .ask h3{font-weight:700;font-size:17px;margin:0 0 8px;letter-spacing:-0.02em}
 .ask p{margin:0;font-size:14.5px;color:#222}
+.ask p.warn{margin-top:12px;padding:10px 12px;background:var(--paper);border-left:3px solid var(--red);font-size:13.5px}
+.ask p.warn b{display:block;color:var(--red);font-size:12px;letter-spacing:.04em;margin-bottom:2px}
 
 /* 프레임 5종 */
 .gallery{display:flex;gap:18px;align-items:flex-start;overflow-x:auto;padding-bottom:8px}
@@ -151,41 +153,41 @@ td.y{color:#1a7f37;font-weight:600} td.n{color:#ca2b22;font-weight:600}
     <a class="mail" href="mailto:hw941027@gmail.com">문의 · hw941027@gmail.com</a>
     <a class="btn" href="https://seemefeel-photobooth.vercel.app/" target="_blank" rel="noopener">포토부스 열어보기</a>
     <span class="url">seemefeel-photobooth.vercel.app</span>
-    <span class="how">아이패드를 세로로 세워 사파리에서 열면 실제 화면 그대로입니다. 카메라 권한을 허용해 주세요.</span>
+    <span class="how">아이패드를 세로로 세워 Safari에서 열면 실제 화면과 동일합니다. 카메라 권한 허용이 필요합니다.</span>
   </div>
 </header>
 
 <section class="sec">
-  <h2><span class="n">01</span>지금 화면</h2>
+  <h2><span class="n">01</span>현재 화면</h2>
   <div class="shots">
-    <figure><img src="shot-before.webp" alt="촬영 전 화면"><figcaption><b>촬영 전</b>화면 효과와 뼈다귀 효과를 고르고 시작을 누릅니다. 오른쪽 미리보기에 라이브 화면이 비치고, 촬영이 시작되면 찍힌 컷이 한 장씩 쌓여요.</figcaption></figure>
-    <figure><img src="shot-after.webp" alt="촬영 후 화면"><figcaption><b>촬영 후</b>완성된 4컷과 QR, 저장, 다시 찍기. QR과 버튼은 같은 폭으로 오른쪽에 모았습니다.</figcaption></figure>
+    <figure><img src="shot-before.webp" alt="촬영 전 화면"><figcaption><b>촬영 전</b>화면 효과와 뼈다귀 효과를 선택한 뒤 시작 버튼을 누릅니다. 오른쪽 미리보기에는 라이브 화면이 표시되며, 촬영이 시작되면 촬영된 컷이 한 장씩 채워집니다.</figcaption></figure>
+    <figure><img src="shot-after.webp" alt="촬영 후 화면"><figcaption><b>촬영 후</b>완성된 4컷과 QR 코드, 저장, 다시 찍기 버튼이 표시됩니다. QR 코드와 버튼은 같은 폭으로 오른쪽에 배치했습니다.</figcaption></figure>
   </div>
 </section>
 
 <section class="sec">
-  <h2><span class="n">02</span>확인 부탁드려요</h2>
+  <h2><span class="n">02</span>확인 필요 사항</h2>
   <div class="ask">
-    <div><span class="k">QR</span><h3>QR은 최종안 확정 뒤부터 씁니다</h3><p>지금 화면의 QR은 자리만 잡아 둔 것이라 찍어도 사진이 열리지 않아요. 확정되면 행사용 저장소를 연결해 QR로 바로 가져갈 수 있게 합니다. 그 전까지는 저장 버튼으로 기기에 저장돼요.</p></div>
-    <div><span class="k">COPY</span><h3>결과 화면 오른쪽 아래가 비어 있습니다</h3><p>QR과 버튼 아래 자리에 넣을 문구가 있으면 보내 주세요. 방송 시간이나 유튜브 채널 안내, 해시태그처럼 짧은 문구가 맞습니다. 받는 대로 그 자리에 넣어 드릴게요.</p></div>
+    <div><span class="k">QR 코드</span><h3>QR 코드는 최종 확정 이후 사용 가능합니다</h3><p>현재 화면의 QR 코드는 자리만 잡아 둔 상태이며, 스캔해도 사진이 열리지 않습니다. 최종안 확정 후 행사용 저장소를 연결하면 QR 코드로 바로 가져갈 수 있습니다. 그 전까지는 저장 버튼으로 기기에 저장됩니다.</p><p class="warn"><b>사용 시 주의사항</b> QR 코드는 아이패드가 와이파이에 연결되어 있어야 작동합니다. 연결이 끊겨 사진이 업로드되지 않으면 QR 코드가 표시되지 않으며, 이 경우에도 저장 버튼은 정상 동작합니다.</p></div>
+    <div><span class="k">문구</span><h3>결과 화면 오른쪽 하단 문구</h3><p>QR 코드와 버튼 아래 공간이 비어 있습니다. 넣고자 하는 마케팅 문구(방송 시간, 유튜브 채널 안내, 해시태그 등)가 있으면 전달해 주시기 바랍니다. 짧은 문구가 적합하며, 전달받는 대로 해당 위치에 반영하겠습니다.</p></div>
   </div>
 </section>
 
 <section class="sec">
-  <h2><span class="n">03</span>들어 있는 것</h2>
-  <p class="lead">뼈다귀 효과 5종입니다. 사진 자리는 회색으로 비워 두었어요.</p>
+  <h2><span class="n">03</span>구성 내용</h2>
+  <p class="lead">뼈다귀 효과 5종입니다. 사진 영역은 회색으로 비워 두었습니다.</p>
   <div class="gallery" id="gallery"></div>
   <ul class="facts">
     <li>화면 효과 2종: 오리지널, 스크린톤.</li>
-    <li>출연자 네 분의 사진은 톤을 맞춰 보정했고, 심의필 도장은 사선으로 찍힙니다.</li>
-    <li>심의미필 버전은 검정 종이에 빨간 도장이고, 출연자 눈과 손에 모자이크가 들어가요.</li>
+    <li>출연자 4인의 사진은 톤을 맞춰 보정했으며, 심의필 도장은 사선으로 찍힙니다.</li>
+    <li>심의미필 버전은 검정 종이에 빨간 도장이며, 출연자의 눈과 손에 모자이크가 적용됩니다.</li>
   </ul>
 </section>
 
 <details class="archive" id="archive">
-  <summary>화면 배치 검토 기록 <small>A안(좌우 2단)을 적용했습니다</small></summary>
+  <summary>화면 배치 검토 기록 <small>A안(좌우 2단) 적용</small></summary>
   <div class="archive-body">
-    <p class="intro">세로로 세운 아이패드(820×1180) 기준입니다. 카메라 자리만 회색이고 반투명 출연자 가이드는 실제 동작입니다. 프레임 버튼을 누르면 미리보기가 바뀝니다.</p>
+    <p class="intro">세로로 세운 아이패드(820×1180) 기준입니다. 카메라 영역만 회색이며, 반투명 출연자 가이드는 실제 동작과 같습니다. 프레임 버튼을 누르면 미리보기가 바뀝니다.</p>
     <div class="tw"><table>
 <tr><th></th><th>기존 (한 열)</th><th>A 좌우 2단</th><th>B 위아래 고정</th><th>C 두 화면</th></tr>
 <tr><th>라이브 카메라 폭</th><td>514px</td><td>~430px</td><td>560px</td><td>772px (촬영 화면)</td></tr>
