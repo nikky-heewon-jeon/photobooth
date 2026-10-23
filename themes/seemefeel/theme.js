@@ -102,7 +102,7 @@ export default {
   flow: 'two',     // C안 — 고르기 화면(큰 칩·큰 미리보기) → 시작 → 촬영 화면(라이브뷰가 폭을 다 씀) → 촬영 시작. 자리 잡을 시간을 준다
   defaultFrame: 'tall-p', // 처음엔 심의필 오리지날이 골라져(빨강) 있다
   labels: { filters:'화면 효과', frames:'뼈다귀 효과', shoot:'시작', download:'저장',
-            go:'촬영 시작', back:'프레임 다시 고르기', hint:'뼈다귀 효과를 고르고 시작을 누르면, 다음 화면에서 자리를 잡은 뒤 촬영이 시작돼요.' }, // 칸 이름·버튼 글자·고르기 화면 안내
+            go:'촬영 시작', back:'프레임 다시 고르기' }, // 칸 이름·버튼 글자 (고르기 화면 안내문 hint는 뺐다)
   images: { frame:'assets/frame.jpg', paper:'assets/paper-floral.webp', // 컬러 꽃 지면(디자이너 background.png를 스트립 비율로 잘라 둠) — 심의필 오리지날의 종이
             cha:'assets/cha.png',   kim:'assets/kim.png',   pd:'assets/pd.png', andme:'assets/andme.jpg', // 일러스트, 4컷 '그리고 나' 상자
             pcha:'assets/pcha.webp', pkim:'assets/pkim-2.webp', ppd:'assets/ppd.webp', // 실사 누끼 (pgan-heart.webp는 심의필 게스트 프레임을 빼면서 안 띄움)
@@ -112,13 +112,14 @@ export default {
     {id:'original', name:'오리지널', css:'none'},
     {id:'tone',     name:'스크린톤', css:'grayscale(1) contrast(1.18)'},
   ],
-  frames: [ // layout: 캔버스·컷 배치 / cast: 어떤 출연자 그림을 세울지. 칩은 name(계열) 아래 sub(버전)를 작게 한 줄로. color는 계열 색
-    {id:'tall-i', name:'일러스트', sub:'세로 버-전',          layout:'tall', cast:'illust',     bg:'#0a0a0a', txt:RED},
+  frames: [ // 순서가 곧 칩 순서 — 심의필 오리지날(기본) · 심의미필 게스트 · 일러스트(맨 아래). layout: 캔버스·컷 배치 / cast: 어떤 출연자 그림을 세울지. 칩은 name(계열) 아래 sub(버전)를 작게 한 줄로. color는 계열 색
     {id:'tall-p', name:'심의필',   sub:'오리지날-버-전',      layout:'tall', cast:'photo',      paper:true, paperImage:'paper', cutLine:false, bg:'#f7f6f2', txt:RED, color:RED,
      stamp:{blend:'source-over', vintage:true, wash:true}}, // paper: 종이 + 도장, paperImage: 종이 대신 컬러 꽃 지면. 컷 선 없이 사진만(2번 안).
      // 도장은 빈티지(검토 4안): 자리 지면을 희게 바래고(wash), 원래 빨강 그대로 불투명하게 살짝 번지게 얹는다(vintage) — 꽃 위·어두운 사진 위 어디서든 읽힌다
     {id:'tall-g2',name:'심의미필', sub:'스페-샬 게스트 버-전', layout:'tall', cast:'photoGuestM', paper:true, paperColor:'#141414', bg:'#141414', txt:'#d7000f', color:'#787878',
      stamp:{key:'stamp2w', w:860, cx:600, blend:'source-over', color:'#d7000f'}}, // 검정 종이 + 눈 모자이크 + 빨간 심의미필 도장(흰 도장을 도장 원본 빨강으로 물들임 — 속빈 곳은 검정 종이가 비침). 칩은 회색
+
+    {id:'tall-i', name:'일러스트', sub:'세로 버-전',          layout:'tall', cast:'illust',     bg:'#0a0a0a', txt:RED},
   ],
 
   // 스트립 전체를 그린다 — 캔버스 크기·배경·컷·출연자·테두리

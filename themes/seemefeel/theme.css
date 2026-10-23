@@ -69,7 +69,6 @@ body[data-flow="two"] #capScreen .chip small, body[data-flow="two"] #frames .chi
 body[data-flow="two"] #capScreen #frames .chip{ flex-basis:100% }
 body[data-flow="two"] #capScreen .lab{ font-size:14px }
 body[data-flow="two"] #capScreen #shoot{ margin-top:18px }
-.hint{ font-weight:300; border-top-color:#e3e1dc }
 #shootScreen header{ margin-bottom:14px }
 #shootScreen .mark{ height:52px; max-width:200px; background:url("assets/logo-black.png") center/contain no-repeat }
 #shootScreen .slot{ border-width:2px; color:#c9c5bd }

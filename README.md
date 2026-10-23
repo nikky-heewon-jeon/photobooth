@@ -56,8 +56,9 @@ git push    # 이후로는 이것만
 [index.html](index.html)의 `CLOUD_NAME`·`UPLOAD_PRESET` 두 값으로 설정한다. 둘 중 하나라도 비우면
 QR 자리에 안내만 뜨고 SAVE(로컬 저장)는 그대로 동작한다.
 
-지금은 지은불사 포토부스의 preset(`jebs-pb`)을 그대로 쓰고 있어서 사진이 같은 폴더에 섞인다.
-Cloudinary에서 unsigned preset을 새로 만들어 바꾸면 분리된다.
+preset은 지은불사 때 만든 `jebs-pb`를 같이 쓰되, `UPLOAD_FOLDER`로 행사 폴더·태그를 준다 — 무서명
+업로드도 `folder`·`tags` 파라미터는 받아주므로 preset을 새로 안 만들어도 Cloudinary 미디어 라이브러리에서
+`seemefeel/` 폴더로 분리된다(2026-10-23 확인). 새 행사는 이 값만 바꾼다.
 
 ## 아직 없는 것
 
