@@ -50,10 +50,17 @@ function tintOf(im,color){ // 흰 도장을 color로 물들인다(알파·질감
     q.drawImage(im,0,0); q.globalCompositeOperation='source-in'; q.fillStyle=color; q.fillRect(0,0,c.width,c.height); _tint[k]=c; }
   return _tint[k];
 }
-function seal(x,im,{cx,cy,w,deg,blend='multiply',color}){ // 도장 — 흰 종이엔 multiply로 스민 느낌, 색 종이엔 그냥 올린다(곱하면 죽는다). color면 그 색으로 물들여 찍는다
-  const h=w*im.naturalHeight/im.naturalWidth;
-  x.save(); x.translate(cx,cy); x.rotate(deg*Math.PI/180); x.globalAlpha=.94; x.globalCompositeOperation=blend;
-  x.drawImage(color?tintOf(im,color):im,-w/2,-h/2,w,h); x.restore();
+const _soft={};
+function soft(im,f){ // 흐린 사본 — 축소해 두고 크게 그리면 번진다. 캔버스 filter(blur)는 Safari 지원이 들쭉날쭉해서 안 쓴다
+  const k=(im.src||'')+im.width+'/'+f; if(!_soft[k]){ const c=document.createElement('canvas'); c.width=Math.max(1,Math.round((im.naturalWidth||im.width)*f)); c.height=Math.max(1,Math.round((im.naturalHeight||im.height)*f));
+    const q=c.getContext('2d'); q.imageSmoothingQuality='high'; q.drawImage(im,0,0,c.width,c.height); _soft[k]=c; }
+  return _soft[k];
+}
+function seal(x,im,{cx,cy,w,deg,blend='multiply',color,vintage}){ // 도장 — 흰 종이엔 multiply로 스민 느낌, 색 종이엔 그냥 올린다(곱하면 죽는다). color면 그 색으로 물들여 찍는다
+  const h=w*im.naturalHeight/im.naturalWidth, src=color?tintOf(im,color):im;
+  x.save(); x.translate(cx,cy); x.rotate(deg*Math.PI/180); x.globalCompositeOperation=blend;
+  if(vintage){ const w2=w+10, h2=h*w2/w; x.globalAlpha=.22; x.drawImage(soft(src,.12),-w2/2,-h2/2,w2,h2); } // 번진 자국 한 겹
+  x.globalAlpha=.94; x.drawImage(vintage?soft(src,.5):src,-w/2,-h/2,w,h); x.restore(); // vintage: 가장자리만 살짝 흐리게
 }
 function cover(x,img,dx,dy,dw,dh){ // 비율 유지하고 가운데를 채운다
   const s=Math.max(dw/img.width,dh/img.height), cw=dw/s, ch=dh/s;
@@ -107,7 +114,9 @@ export default {
   ],
   frames: [ // layout: 캔버스·컷 배치 / cast: 어떤 출연자 그림을 세울지. 칩은 name(계열) 아래 sub(버전)를 작게 한 줄로. color는 계열 색
     {id:'tall-i', name:'일러스트', sub:'세로 버-전',          layout:'tall', cast:'illust',     bg:'#0a0a0a', txt:RED},
-    {id:'tall-p', name:'심의필',   sub:'오리지날-버-전',      layout:'tall', cast:'photo',      paper:true, paperImage:'paper', cutLine:false, bg:'#f7f6f2', txt:RED, color:RED}, // paper: 종이 + 도장, paperImage: 종이 대신 컬러 꽃 지면. 컷 선 없이 사진만(2번 안)
+    {id:'tall-p', name:'심의필',   sub:'오리지날-버-전',      layout:'tall', cast:'photo',      paper:true, paperImage:'paper', cutLine:false, bg:'#f7f6f2', txt:RED, color:RED,
+     stamp:{blend:'source-over', vintage:true, wash:true}}, // paper: 종이 + 도장, paperImage: 종이 대신 컬러 꽃 지면. 컷 선 없이 사진만(2번 안).
+     // 도장은 빈티지(검토 4안): 자리 지면을 희게 바래고(wash), 원래 빨강 그대로 불투명하게 살짝 번지게 얹는다(vintage) — 꽃 위·어두운 사진 위 어디서든 읽힌다
     {id:'tall-g2',name:'심의미필', sub:'스페-샬 게스트 버-전', layout:'tall', cast:'photoGuestM', paper:true, paperColor:'#141414', bg:'#141414', txt:'#d7000f', color:'#787878',
      stamp:{key:'stamp2w', w:860, cx:600, blend:'source-over', color:'#d7000f'}}, // 검정 종이 + 눈 모자이크 + 빨간 심의미필 도장(흰 도장을 도장 원본 빨강으로 물들임 — 속빈 곳은 검정 종이가 비침). 칩은 회색
   ],
@@ -119,7 +128,10 @@ export default {
     const L=LAYOUT[g.frame.paper?'paper':'floral'][g.frame.layout], plan=PLAN[g.frame.cast][g.frame.layout];
     cv.width=L.W; cv.height=L.H; const x=cv.getContext('2d'); x.imageSmoothingQuality='high';
     const pi=g.frame.paperImage&&g.img[g.frame.paperImage]; // paperImage: 종이 대신 그림을 깐다(비율 유지, 가운데 채움). 로딩 전엔 종이색
-    if(g.frame.paper){ if(ready(pi)) cover(x,pi,0,0,L.W,L.H); else paperBg(x,L.W,L.H,g.frame.paperColor); } else tallBg(x,fr);
+    const st=g.frame.paper&&{...L.stamp, ...(g.frame.stamp||{})}; // 도장 자리·찍는 방식(프레임별로 다름)
+    if(g.frame.paper){ if(ready(pi)) cover(x,pi,0,0,L.W,L.H); else paperBg(x,L.W,L.H,g.frame.paperColor);
+      if(st.wash){ const r=x.createRadialGradient(st.cx,st.cy,0,st.cx,st.cy,600); r.addColorStop(0,'rgba(255,255,255,.72)'); r.addColorStop(1,'rgba(255,255,255,0)'); x.fillStyle=r; x.fillRect(0,0,L.W,L.H); } // 도장 자리 지면을 안개처럼 바래게 — 무늬 위에서도 도장이 읽히게
+    } else tallBg(x,fr);
     L.rects.forEach((r,i)=>{
       const s=shots[i];
       if(s) cover(x,s,...r); else { x.fillStyle='#bdbdbd'; x.fillRect(...r); }
@@ -130,7 +142,7 @@ export default {
       if(g.frame.cutLine!==false) border(x,...r); // cutLine:false — 컷마다 두르는 검정 선을 뺀다(종이에 인화된 사진처럼)
     });
     if(g.frame.edge){ x.strokeStyle='#141414'; x.lineWidth=g.frame.edge; x.strokeRect(g.frame.edge/2,g.frame.edge/2,L.W-g.frame.edge,L.H-g.frame.edge); } // edge — 종이 바깥을 두르는 검정 선(px)
-    if(g.frame.paper){ const st={...L.stamp, ...(g.frame.stamp||{})}, im=g.img[st.key||'stamp']; if(ready(im)) seal(x,im,st); } // 4컷 아래를 물고 찍힌 도장 (프레임별로 다른 도장 가능)
+    if(g.frame.paper){ const im=g.img[st.key||'stamp']; if(ready(im)) seal(x,im,st); } // 4컷 아래를 물고 찍힌 도장 (프레임별로 다른 도장 가능)
   },
 
   // 라이브뷰 가이드 — 이 컷에 실제로 담기는 띠만 밝게, 출연자를 반투명으로 제자리에
