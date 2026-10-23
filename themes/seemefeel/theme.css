@@ -65,6 +65,9 @@ header{ width:100%; margin-bottom:32px } /* 로고 아래 여백을 위(.screen 
    뼈다귀 효과가 3종이라 칩이 한 줄에 하나씩 — 세 줄 다 폭을 꽉 채우고 높이도 키운다. 촬영 화면: 작은 로고, 컷 칸은 굵은 선 */
 body[data-flow="two"] #capScreen .capmain{ grid-template-columns:minmax(0,1fr) 310px }
 body[data-flow="two"] #capScreen .chip{ padding:19px 8px; font-size:26px; min-height:120px }
+/* 칩이 패널 높이(=미리보기 열 높이)를 다 채우게 — 아래 빈 여백 없이. 화면 효과 1줄 : 뼈다귀 효과 3줄 = 1:3 */
+body[data-flow="two"] #capScreen #filters{ flex:1 1 0 }
+body[data-flow="two"] #capScreen #frames{ flex:3 1 0 }
 body[data-flow="two"] #capScreen .chip small, body[data-flow="two"] #frames .chip small{ font-size:min(16px, 3.4cqw); margin-top:8px }
 body[data-flow="two"] #capScreen #frames .chip{ flex-basis:100% }
 body[data-flow="two"] #capScreen .lab{ font-size:14px }

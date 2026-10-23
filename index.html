@@ -273,6 +273,18 @@ else{ const r=$('phrases'); r.previousElementSibling.remove(); r.remove(); }
 
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 
+// 효과음 — 맥 포토부스처럼 카운트마다 삐, 찍을 때 찰칵. 파일 없이 Web Audio로 합성한다.
+// iOS는 터치 안에서 AudioContext를 만들어야 소리가 나므로 shoot()(버튼 클릭 핸들러) 첫 줄에서 audio()를 부른다. 아이패드 무음 스위치가 켜져 있으면 안 들릴 수 있다.
+let AC=null;
+function audio(){ try{ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended') AC.resume(); }catch(e){ AC=null; } return AC; }
+function beep(f=880,dur=.18,vol=.3){ const a=audio(); if(!a) return; const o=a.createOscillator(), g=a.createGain(), t=a.currentTime;
+  o.type='sine'; o.frequency.value=f; g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.001,t+dur);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t+dur); }
+function shutter(){ const a=audio(); if(!a) return; const n=Math.floor(a.sampleRate*.08), buf=a.createBuffer(1,n,a.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2.5); // 짧은 잡음 — 셔터 '찰'
+  const click=(t,vol,fq)=>{ const src=a.createBufferSource(); src.buffer=buf; const f=a.createBiquadFilter(); f.type='bandpass'; f.frequency.value=fq; f.Q.value=.7; const g=a.createGain(); g.gain.value=vol; src.connect(f).connect(g).connect(a.destination); src.start(t); };
+  click(a.currentTime,.9,2600); click(a.currentTime+.075,.6,1800); } // 찰·칵 두 번
+
 // 촬영 가이드 — 테마가 guide()를 주면 i번째 컷에 맞춰 라이브뷰 위에 그린다(출연자 반투명·잘리는 영역)
 function drawGuide(i){
   const g=$('guide'); if(!T.guide){ g.width=g.height=0; return; }
@@ -305,15 +317,15 @@ function updatePreview(){
 
 const shootBtns=()=>TWO?[$('go'),$('back')]:[$('shoot')]; // 촬영 중 잠글 버튼
 async function shoot(){
-  busy=true;
+  busy=true; audio(); // 클릭(사용자 터치) 안에서 오디오를 깨운다
   shootBtns().forEach(b=>b.disabled=true); shots=[]; resetSlots(); prog.style.display='block';
   let pending=null;
   for(let i=0;i<SHOTS;i++){
     drawGuide(i); if(TWO) slot(i).classList.add('cur');
     prog.textContent=`${i+1} / ${SHOTS}`; count.style.display='flex';
-    for(let n=3;n>0;n--){ count.textContent=n; await wait(800); }
+    for(let n=3;n>0;n--){ count.textContent=n; beep(); await wait(800); }
     count.textContent='●'; await wait(150);
-    flash.classList.remove('on'); void flash.offsetWidth; flash.classList.add('on');
+    shutter(); flash.classList.remove('on'); void flash.offsetWidth; flash.classList.add('on');
     shots.push(snap()); fillSlot(i,shots[i]); count.style.display='none';
     if(i===SHOTS-1){ compose(); pending=(CLOUD_NAME&&UPLOAD_PRESET)?startUpload():null; } // 마지막 컷 직후 업로드 시작(대기와 겹침)
     await wait(550);
