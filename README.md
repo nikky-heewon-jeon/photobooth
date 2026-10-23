@@ -29,7 +29,8 @@ open http://localhost:8787/?theme=<이름>
 | `slug` | | 저장 파일명 접두사 (기본 `photobooth`) |
 | `frames` | O | `{id, name, sub?, color?, bg, txt}` 배열. 스트립 배경색과 글자색. `sub`는 칩 둘째 줄(작게), `color`는 칩 색 |
 | `preview` | X | `'side'`면 미리보기를 오른쪽 열에 세운다(세로 아이패드 한 화면). 없으면 패널 안 아래 |
-| `labels` | X | `{filters, frames, phrases, preview, shoot, download, retake}` 칸 이름·버튼 글자를 바꾼다(예: 필터→화면 효과, download→저장) |
+| `flow` | X | `'two'`면 고르기 화면과 촬영 화면을 나눈다. 고르기 화면엔 라이브뷰 없이 칩·미리보기·START, START를 누르면 촬영 화면(라이브뷰가 폭을 다 씀)에서 `촬영 시작`을 한 번 더 누른다. 자리 잡을 시간을 주는 대신 터치가 한 번 는다 |
+| `labels` | X | `{filters, frames, phrases, preview, shoot, download, retake, go, back, hint}` 칸 이름·버튼 글자를 바꾼다(예: 필터→화면 효과, download→저장). `go`·`back`은 촬영 화면 버튼, `hint`는 고르기 패널 맨 아래 안내문(둘 다 `flow:'two'`일 때만 보인다) |
 | `phrases` | O | 문구 칩. 첫 항목이 기본값, `''`는 문구 없음 |
 | `css` | | 이 폴더의 CSS를 덧씌운다 (폰트·색·장식) |
 

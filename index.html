@@ -83,6 +83,20 @@
     body[data-preview="side"] #capScreen .capmain{grid-template-areas:"head" "panel" "pv" "btn"}
     body[data-preview="side"] #resScreen .capmain{grid-template-areas:"head" "strip" "side"} }
 
+  /* 두 화면 흐름(테마 flow:'two') — 고르기 화면엔 칩·미리보기·START만, START를 누르면 촬영 화면(라이브뷰가 폭을 다 씀)에서 '촬영 시작'.
+     촬영 화면은 꺼져 있어도 display:none으로 숨기지 않는다 — iOS Safari가 안 보이는 비디오를 멈춰 고르기 화면의 미리보기가 얼어붙는다.
+     대신 화면 크기 그대로 투명하게 깔아 둔다(터치 안 받음) */
+  body[data-flow="two"][data-preview="side"] #capScreen .capmain{grid-template-areas:"head head" "panel pv" "btn btn"; align-items:stretch}
+  .hint{margin-top:auto; font-size:13px; line-height:1.7; color:var(--dim); border-top:1px solid var(--line); padding-top:14px}
+  #shootScreen:not(.on){display:flex; position:fixed; inset:0; opacity:0; pointer-events:none; z-index:-1}
+  #shootScreen .capmain{max-width:none; width:100%; display:flex; flex-direction:column; align-items:stretch} /* preview:'side'의 grid 규칙을 덮는다 */
+  #shootScreen .btn,#stagebox{max-width:none; width:100%}
+  .slots{display:flex; gap:12px; margin:18px 0; width:100%}
+  .slot{position:relative; flex:1; aspect-ratio:3/2; border:1px solid var(--line); background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:22px; color:var(--dim); overflow:hidden}
+  .slot.cur{background:#bdbdbd; color:var(--fg)} /* 지금 찍는 컷 */
+  .slot canvas{position:absolute; inset:0; width:100%; height:100%; display:none}
+  .slot.on canvas{display:block} /* 찍힌 컷 */
+
   /* 좌 브랜드 컬럼 + 우 콘텐츠. 테마가 brand를 안 주면 컬럼은 사라진다 */
   .capwrap{display:flex; gap:32px; align-items:flex-start; justify-content:center; width:100%; max-width:900px; margin:0 auto}
   .brand{flex:0 0 280px; display:flex; flex-direction:column; align-items:center; gap:16px}
@@ -136,8 +150,23 @@
       <p class="lab">미리보기</p>
       <div class="preview-wrap"><canvas id="preview"></canvas></div>
     </div>
+    <p class="hint" id="hint" hidden></p>
   </div>
   <button class="btn btn-go full" id="shoot">START</button>
+    </div>
+  </div>
+</section>
+
+<!-- 촬영 화면 — 테마 flow:'two'일 때만 쓴다. 라이브뷰(.stage)를 위 패널에서 #stagebox로 옮겨 온다 -->
+<section class="screen" id="shootScreen">
+  <div class="capwrap">
+    <aside class="brand"></aside>
+    <div class="capmain">
+  <header><div class="mark">PHOTO BOOTH</div></header>
+  <div id="stagebox"></div>
+  <div class="slots" id="slots"></div>
+  <button class="btn btn-go full" id="go">촬영 시작</button>
+  <button class="btn btn-ghost" id="back">다시 고르기</button>
     </div>
   </div>
 </section>
@@ -173,7 +202,7 @@ const SHOTS=4, PW=400, PH=267, PAD=24, GAP=14, FOOT=82, DPR=3;
 
 // ── 테마 로드 ──────────────────────────────────────────────────────
 // ?theme=<폴더명> → themes/<폴더명>/theme.js. 없거나 못 읽으면 base로 떨어진다.
-// 테마 계약: {name, slug, frames:[{id,name,sub?,color?,bg,txt}], defaultFrame?, phrases:[], css?, preview?:'side', labels?:{filters,frames,phrases,preview,shoot,download,retake}}
+// 테마 계약: {name, slug, frames:[{id,name,sub?,color?,bg,txt}], defaultFrame?, phrases:[], css?, preview?:'side', flow?:'two', labels?:{filters,frames,phrases,preview,shoot,download,retake,go,back,hint}}
 const THEME_ID=new URLSearchParams(location.search).get('theme')||'base';
 const asset=p=>`themes/${THEME_ID}/${p}`; // 테마 폴더 기준으로 경로 해석
 let T, themeErr=false;
@@ -195,7 +224,7 @@ if(T.preview==='side'){ const pv=document.getElementById('pv'); pv.classList.add
 const LAB={filters:'#filters', frames:'#frames', phrases:'#phrases', preview:'#pv .preview-wrap'};
 for(const [k,txt] of Object.entries(T.labels||{})){
   if(LAB[k]){ const el=document.querySelector(LAB[k]); if(el) el.previousElementSibling.textContent=txt; }
-  else{ const b=document.getElementById(k); if(b) b.textContent=txt; } // shoot / download / retake 버튼
+  else{ const b=document.getElementById(k); if(b){ b.textContent=txt; b.hidden=false; } } // shoot / download / retake / go / back 버튼, hint 문구
 }
 
 const FX=T.filters||FILTERS;   // 테마가 자기 필터를 주면 그걸 쓴다(기본 목록은 건드리지 않는다)
@@ -203,6 +232,13 @@ let filter=FX[0], frame=T.frames.find(f=>f.id===T.defaultFrame)||T.frames[0], ph
 
 const $=id=>document.getElementById(id);
 const video=$('cam'), flash=$('flash'), count=$('count'), prog=$('prog');
+// 두 화면 흐름(flow:'two') — 라이브뷰를 고르기 패널에서 촬영 화면으로 옮기고, 찍힌 컷이 쌓이는 칸 4개를 만든다
+const TWO=T.flow==='two';
+if(TWO){ document.body.dataset.flow='two'; $('stagebox').append(document.querySelector('.stage'), $('err'));
+  $('slots').innerHTML=Array.from({length:SHOTS},(_,i)=>`<div class="slot"><span>${i+1}</span><canvas></canvas></div>`).join(''); }
+const slot=i=>$('slots').children[i];
+function resetSlots(){ if(TWO) [...$('slots').children].forEach(s=>s.classList.remove('on','cur')); }
+function fillSlot(i,shot){ if(!TWO) return; const c=slot(i).querySelector('canvas'); c.width=300; c.height=200; c.getContext('2d').drawImage(shot,0,0,300,200); slot(i).classList.replace('cur','on'); }
 
 function chips(host, list, render, onPick, sel=0){
   list.forEach((t,i)=>{
@@ -266,21 +302,22 @@ function updatePreview(){
   compose($('preview'), Array.from({length:SHOTS},(_,i)=>shots[i]||s)); // 찍힌 컷은 그대로 쌓이고, 아직 안 찍은 컷엔 라이브가 비친다
 }
 
+const shootBtns=()=>TWO?[$('go'),$('back')]:[$('shoot')]; // 촬영 중 잠글 버튼
 async function shoot(){
   busy=true;
-  $('shoot').disabled=true; shots=[]; prog.style.display='block';
+  shootBtns().forEach(b=>b.disabled=true); shots=[]; resetSlots(); prog.style.display='block';
   let pending=null;
   for(let i=0;i<SHOTS;i++){
-    drawGuide(i);
+    drawGuide(i); if(TWO) slot(i).classList.add('cur');
     prog.textContent=`${i+1} / ${SHOTS}`; count.style.display='flex';
     for(let n=3;n>0;n--){ count.textContent=n; await wait(800); }
     count.textContent='●'; await wait(150);
     flash.classList.remove('on'); void flash.offsetWidth; flash.classList.add('on');
-    shots.push(snap()); count.style.display='none';
+    shots.push(snap()); fillSlot(i,shots[i]); count.style.display='none';
     if(i===SHOTS-1){ compose(); pending=(CLOUD_NAME&&UPLOAD_PRESET)?startUpload():null; } // 마지막 컷 직후 업로드 시작(대기와 겹침)
     await wait(550);
   }
-  prog.style.display='none'; $('shoot').disabled=false; busy=false;
+  prog.style.display='none'; shootBtns().forEach(b=>b.disabled=false); busy=false;
   drawGuide(0); show('resScreen'); makeQR(pending);
 }
 
@@ -331,7 +368,8 @@ function compose(cv=$('strip'), list=shots){
 
 function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id===id)); window.scrollTo(0,0); }
 
-$('shoot').onclick=shoot;
+if(TWO){ $('shoot').onclick=()=>{ resetSlots(); show('shootScreen'); drawGuide(0); }; $('go').onclick=shoot; $('back').onclick=()=>show('capScreen'); } // START → 촬영 화면 → 촬영 시작
+else $('shoot').onclick=shoot;
 $('retake').onclick=()=>{ shots=[]; show('capScreen'); }; // 다시 찍기 — 쌓인 컷을 비워 미리보기가 다시 전부 라이브로
 setInterval(()=>{ if($('capScreen').classList.contains('on')) updatePreview(); }, 450);
 // 테마 웹폰트가 늦게 뜨면 캔버스가 대체 폰트로 그려지므로, 로드 후 한 번 다시 그린다

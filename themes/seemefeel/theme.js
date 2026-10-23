@@ -96,9 +96,11 @@ export default {
   name: '심의필',
   slug: 'seemefeel',
   css: 'theme.css',
-  preview: 'side', // 세로 아이패드 한 화면: 왼쪽 라이브뷰·칩·START, 오른쪽 미리보기 (스크롤 없음)
+  preview: 'side', // 세로 아이패드 한 화면: 왼쪽 칩·START, 오른쪽 미리보기 (스크롤 없음)
+  flow: 'two',     // C안 — 고르기 화면(큰 칩·큰 미리보기) → 시작 → 촬영 화면(라이브뷰가 폭을 다 씀) → 촬영 시작. 자리 잡을 시간을 준다
   defaultFrame: 'tall-p', // 처음엔 심의필 오리지날이 골라져(빨강) 있다
-  labels: { filters:'화면 효과', frames:'뼈다귀 효과', shoot:'시작', download:'저장' }, // 칸 이름·버튼 글자
+  labels: { filters:'화면 효과', frames:'뼈다귀 효과', shoot:'시작', download:'저장',
+            go:'촬영 시작', back:'프레임 다시 고르기', hint:'뼈다귀 효과를 고르고 시작을 누르면, 다음 화면에서 자리를 잡은 뒤 촬영이 시작돼요.' }, // 칸 이름·버튼 글자·고르기 화면 안내
   images: { frame:'assets/frame.jpg',
             cha:'assets/cha.png',   kim:'assets/kim.png',   pd:'assets/pd.png',      // 일러스트
             pcha:'assets/pcha.webp', pkim:'assets/pkim-2.webp', ppd:'assets/ppd.webp', pgan:'assets/pgan-heart.webp', // 실사 누끼 (김간지는 손가락 하트 포즈 — 심의필 게스트용. 파일명을 바꿔 옛 포즈 캐시를 피함)

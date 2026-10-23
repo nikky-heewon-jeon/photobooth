@@ -61,6 +61,18 @@ header{ width:100%; margin-bottom:32px } /* 로고 아래 여백을 위(.screen 
 #strip, .btn, .btn-ghost{ border:3px solid var(--line) }
 #shoot{ border:none }
 
+/* C안(flow:'two') — 고르기 화면: 칩을 크게(여럿이 서서 고르기 좋게), 미리보기 322px. 촬영 화면: 작은 로고, 컷 칸은 굵은 선 */
+body[data-flow="two"] #capScreen .capmain{ grid-template-columns:minmax(0,1fr) 310px } /* 322면 세로 1180을 13px 넘친다 */
+body[data-flow="two"] #capScreen .chip{ padding:19px 8px; font-size:19px }
+body[data-flow="two"] #capScreen .chip small, body[data-flow="two"] #frames .chip small{ font-size:min(13px, 2.8cqw); margin-top:6px }
+body[data-flow="two"] #capScreen .lab{ font-size:14px }
+body[data-flow="two"] #capScreen #shoot{ margin-top:18px }
+.hint{ font-weight:300; border-top-color:#e3e1dc }
+#shootScreen header{ margin-bottom:14px }
+#shootScreen .mark{ height:52px; max-width:200px; background:url("assets/logo-black.png") center/contain no-repeat }
+#shootScreen .slot{ border-width:2px; color:#c9c5bd }
+#shootScreen .slot.cur{ color:var(--fg) }
+
 /* 스크린톤을 고르면 라이브뷰에도 망점 — 가이드 레이어 배경으로 얹는다(카운트다운 숫자 아래, 영상 위) */
 body[data-filter="tone"] .guide{
   background:
