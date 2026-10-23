@@ -15,10 +15,11 @@ const LAYOUT={ floral:{tall:TALL}, paper:{tall:PTALL} };
 // 컷별 출연자 배치 — side 설 자리 · scale 컷 높이 대비 · down 아래로 내림(음수면 위로) · anchor 기준변. 4컷은 팬만.
 // 팬은 출연자가 몸을 기울이거나 손짓하는 쪽(비어 있는 쪽)에 선다.
 const PLAN={
-  illust:{ // 반신 일러스트 — 김윤주도 김은하처럼 왼쪽에, 팬은 오른쪽
+  illust:{ // 반신 일러스트 — 김윤주도 김은하처럼 왼쪽에, 팬은 오른쪽. 4컷(팬)엔 '그리고 나' 상자를 오른쪽 위에(일러스트 속 이름 상자와 비슷한 크기)
     tall:[{img:'cha',side:'R',scale:1.20,down:.16},
           {img:'kim',side:'L',scale:0.95,down:.14},
-          {img:'pd', side:'L',scale:0.94,down:.12}, null],
+          {img:'pd', side:'L',scale:0.94,down:.12},
+          {img:'andme',side:'R',scale:0.16,down:.06,anchor:'top'}],
   },
   photo:{  // 전신 실사 — 일러스트처럼 상반신만 보이게 키우고, 하트 손이 가운데 오게. 팬은 오른쪽 (세로만 씀)
     tall:[{img:'pcha',side:'L',scale:2.1,down:.11,anchor:'top',shift:-.02},  // 하트 손이 컷 가운데 오게 왼쪽으로 — 몸 왼쪽은 잘림
@@ -33,7 +34,7 @@ PLAN.photoGuestM={ tall:[...PLAN.photoGuest.tall.slice(0,3).map(p=>({...p, img:'
   {img:'mgan',side:'R',scale:2.1,down:.11,anchor:'top',shift:+.05,
    censor:[[-25,172,120,120,18],[272,200,120,120,18]]}] }; // 양손 — 손가락·주먹 주변까지 정사각형(그림 px 기준, 마지막은 블록 크기). 합성 때 뒤의 사진째 굵게 모자이크해 손짓이 안 읽히게
 
-const ready=im=>im&&im.complete&&im.naturalWidth>0;
+const ready=im=>!!im&&(im.tagName==='CANVAS' ? im.width>0 : im.complete&&im.naturalWidth>0); // 이미지 또는 캔버스(검토 페이지가 지면을 캔버스로 넘긴다)
 let _tone=null;
 function tone(x){ // 망점 — 6px 타일 한 번 만들어 재사용
   if(_tone) return _tone;
@@ -96,7 +97,7 @@ export default {
   labels: { filters:'화면 효과', frames:'뼈다귀 효과', shoot:'시작', download:'저장',
             go:'촬영 시작', back:'프레임 다시 고르기', hint:'뼈다귀 효과를 고르고 시작을 누르면, 다음 화면에서 자리를 잡은 뒤 촬영이 시작돼요.' }, // 칸 이름·버튼 글자·고르기 화면 안내
   images: { frame:'assets/frame.jpg', paper:'assets/paper-floral.webp', // 컬러 꽃 지면(디자이너 background.png를 스트립 비율로 잘라 둠) — 심의필 오리지날의 종이
-            cha:'assets/cha.png',   kim:'assets/kim.png',   pd:'assets/pd.png',      // 일러스트
+            cha:'assets/cha.png',   kim:'assets/kim.png',   pd:'assets/pd.png', andme:'assets/andme.jpg', // 일러스트, 4컷 '그리고 나' 상자
             pcha:'assets/pcha.webp', pkim:'assets/pkim-2.webp', ppd:'assets/ppd.webp', // 실사 누끼 (pgan-heart.webp는 심의필 게스트 프레임을 빼면서 안 띄움)
             mcha:'assets/mcha.webp', mkim:'assets/mkim-2.webp', mpd:'assets/mpd.webp',  mgan:'assets/mgan.webp', // 같은 사진, 눈 모자이크 (mgan만 다른 포즈 — 가운뎃손가락, 심의미필용)
             stamp:'assets/stamp.png', stamp2:'assets/stamp2.png', stamp2w:'assets/stamp2w.png' }, // 심의필 / 심의미필 도장 / 흰 심의미필 도장(색 종이용 — color로 물들여 씀)
