@@ -100,7 +100,7 @@ export default {
   css: 'theme.css',
   preview: 'side', // 세로 아이패드 한 화면: 왼쪽 칩·START, 오른쪽 미리보기 (스크롤 없음)
   flow: 'two',     // C안 — 고르기 화면(큰 칩·큰 미리보기) → 시작 → 촬영 화면(라이브뷰가 폭을 다 씀) → 촬영 시작. 자리 잡을 시간을 준다
-  defaultFrame: 'tall-p', // 처음엔 심의필 오리지날이 골라져(빨강) 있다
+  defaultFrame: 'tall-i', // 처음엔 일러스트 세로 버전이 골라져 있다
   labels: { filters:'화면 효과', frames:'뼈다귀 효과', shoot:'시작', download:'저장',
             go:'촬영 시작', back:'프레임 다시 고르기' }, // 칸 이름·버튼 글자 (고르기 화면 안내문 hint는 뺐다)
   images: { frame:'assets/frame.jpg', paper:'assets/paper-floral.webp', // 컬러 꽃 지면(디자이너 background.png를 스트립 비율로 잘라 둠) — 심의필 오리지날의 종이
@@ -112,7 +112,7 @@ export default {
     {id:'original', name:'오리지널', css:'none'},
     {id:'tone',     name:'스크린톤', css:'grayscale(1) contrast(1.18)'},
   ],
-  frames: [ // 순서가 곧 칩 순서 — 일러스트 · 심의필 오리지날(기본) · 심의미필 게스트. layout: 캔버스·컷 배치 / cast: 어떤 출연자 그림을 세울지. 칩은 name(계열) 아래 sub(버전)를 작게 한 줄로. color는 계열 색
+  frames: [ // 순서가 곧 칩 순서 — 일러스트(기본) · 심의필 오리지날 · 심의미필 게스트. layout: 캔버스·컷 배치 / cast: 어떤 출연자 그림을 세울지. 칩은 name(계열) 아래 sub(버전)를 작게 한 줄로. color는 계열 색
     {id:'tall-i', name:'일러스트', sub:'세로 버-전',          layout:'tall', cast:'illust',     bg:'#0a0a0a', txt:RED},
     {id:'tall-p', name:'심의필',   sub:'오리지날-버-전',      layout:'tall', cast:'photo',      paper:true, paperImage:'paper', cutLine:false, bg:'#f7f6f2', txt:RED, color:RED,
      stamp:{blend:'source-over', vintage:true, wash:true}}, // paper: 종이 + 도장, paperImage: 종이 대신 컬러 꽃 지면. 컷 선 없이 사진만(2번 안).
